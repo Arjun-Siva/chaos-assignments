@@ -17,8 +17,11 @@
 *.qm
 .#*
 *.*#
-core
-!core/
+build*
+*.txt.user
+*.cmake
+CMakeCache.txt
+CMakeLists.txt.user
 tags
 .DS_Store
 .directory
