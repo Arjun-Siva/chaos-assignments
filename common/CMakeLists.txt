@@ -4,6 +4,9 @@ target_sources(common
     PRIVATE
         2dShapes/shapes.cpp
         core/vec3.cpp
+        core/triangle.cpp
+        core/color.cpp
+        core/ray.cpp
 )
 
 target_include_directories(common

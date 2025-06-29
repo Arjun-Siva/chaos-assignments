@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <iostream>
 
 class vec3 {
 public:
@@ -13,6 +14,7 @@ public:
     vec3 operator-(const vec3& v) const;
     vec3 operator*(double t) const;
     vec3 operator/(double t) const;
+    friend std::ostream& operator<<(std::ostream& os, const vec3& v);
 
     double dot(const vec3& v) const;
     vec3 cross(const vec3& v) const;

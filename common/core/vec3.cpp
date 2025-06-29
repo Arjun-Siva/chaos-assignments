@@ -1,5 +1,7 @@
 #include "vec3.h"
 
+// methods don't modify the object itself
+
 vec3::vec3() : x(0), y(0), z(0) {}
 vec3::vec3(double x, double y, double z) : x(x), y(y), z(z) {}
 
@@ -17,6 +19,11 @@ vec3 vec3::operator*(double t) const {
 
 vec3 vec3::operator/(double t) const {
     return vec3(x / t, y / t, z / t);
+}
+
+std::ostream& operator<<(std::ostream& os, const vec3& v)  {
+    os << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+    return os;
 }
 
 double vec3::dot(const vec3& v) const {

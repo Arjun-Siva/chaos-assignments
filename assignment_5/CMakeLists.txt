@@ -1,0 +1,2 @@
+add_executable(assignment_5 trianglesIntersection.cpp)
+target_link_libraries(assignment_5 PRIVATE common)
