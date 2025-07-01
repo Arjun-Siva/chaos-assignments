@@ -3,6 +3,8 @@
 #include "ray.h"
 #include "color.h"
 
+const double EPSILON = 1e-6;
+
 Triangle::Triangle(const vec3 &a, const vec3 &b, const vec3 &c) : v0(a), v1(b), v2(c) {
     computeNormal();
 }
@@ -20,7 +22,7 @@ void Triangle::computeNormal() {
 }
 
 double Triangle::intersect(const Ray &r) const {
-    if (normal.dot(r.d) >= 0) return -1; //parallel, backface culling
+    if (normal.dot(r.d) >= -EPSILON) return -1; //parallel, backface culling
 
     //t = -(normal . (O - v0)) / (normal . D)
     double t = -1 * normal.dot(r.o - v0) / normal.dot(r.d);
@@ -33,9 +35,9 @@ double Triangle::intersect(const Ray &r) const {
     vec3 e12 = v2 - v1;
     vec3 e20 = v0 - v2;
 
-    if (normal.dot(e01.cross(p-v0)) <= 0) return -1;
-    if (normal.dot(e12.cross(p-v1)) <= 0) return -1;
-    if (normal.dot(e20.cross(p-v2)) <= 0) return -1;
+    if (normal.dot(e01.cross(p-v0)) <= -EPSILON) return -1;
+    if (normal.dot(e12.cross(p-v1)) <= -EPSILON) return -1;
+    if (normal.dot(e20.cross(p-v2)) <= -EPSILON) return -1;
 
     return t;
 }

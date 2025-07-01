@@ -1,0 +1,85 @@
+#include "camera.h"
+#include "vec3.h"
+#include "ray.h"
+#include "../util/transform.h"
+
+Camera::Camera(float aspectRatio) : aspectRatio(aspectRatio)
+{
+    eye = vec3(0,0,0);
+    forward = vec3(0,0,-1);
+    right = vec3(1,0,0);
+    up = vec3(0,1,0);
+    focalLength = 1.0f;
+}
+
+Camera::Camera(const vec3& eye, const vec3& target, const vec3& upVec, float aspectRatio, float focalLength)
+       : eye(eye), aspectRatio(aspectRatio), focalLength(focalLength)
+{
+   forward = (target - eye).normalized();
+   right = forward.cross(upVec).normalized();
+   up = right.cross(forward).normalized();
+}
+
+Ray Camera::generateRay(float u, float v) const
+{
+    // Center of the image plane
+    vec3 imageCenter = eye + forward * focalLength;
+
+    float viewportHeight = 2.0f;
+    float viewportWidth = viewportHeight * aspectRatio;
+
+    vec3 horizontal = right * viewportWidth;
+    vec3 vertical = up * viewportHeight;
+
+    vec3 lowerLeft = imageCenter - horizontal * 0.5f - vertical * 0.5f;
+
+    // Flip v to match image convention (top-to-bottom)
+    v = 1.0f - v;
+
+    vec3 pixelPos = lowerLeft + horizontal * u + vertical * v;
+    vec3 rayDir = (pixelPos - eye).normalized();
+
+    return Ray{ eye, rayDir };
+}
+
+void Camera::dolly(float distance)
+{
+    eye = eye + forward * distance;
+}
+
+void Camera::boom(float distance)
+{
+    eye = eye + up * distance;
+}
+
+void Camera::truck(float distance)
+{
+    eye = eye + right * distance;
+}
+
+void Camera::pan(float degrees)
+{
+    right = rotateY(degrees) * right;
+    forward = rotateY(degrees) * forward;
+    up = rotateY(degrees) * up;
+}
+
+void Camera::tilt(float degrees)
+{
+    right = rotateX(degrees) * right;
+    forward = rotateX(degrees) * forward;
+    up = rotateX(degrees) * up;
+}
+
+void Camera::roll(float degrees)
+{
+    right = rotateZ(degrees) * right;
+    forward = rotateZ(degrees) * forward;
+    up = rotateZ(degrees) * up;
+}
+
+
+
+
+
+

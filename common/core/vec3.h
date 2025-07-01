@@ -5,19 +5,19 @@
 
 class vec3 {
 public:
-    double x, y, z;
+    float x, y, z;
 
     vec3();
-    vec3(double x, double y, double z);
+    vec3(float x, float y, float z);
 
     vec3 operator+(const vec3& v) const;
     vec3 operator-(const vec3& v) const;
-    vec3 operator*(double t) const;
-    vec3 operator/(double t) const;
+    vec3 operator*(float t) const;
+    vec3 operator/(float t) const;
     friend std::ostream& operator<<(std::ostream& os, const vec3& v);
 
-    double dot(const vec3& v) const;
+    float dot(const vec3& v) const;
     vec3 cross(const vec3& v) const;
     vec3 normalized() const;
-    double length() const;
+    float length() const;
 };

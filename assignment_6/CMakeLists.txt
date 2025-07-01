@@ -1,0 +1,2 @@
+add_executable(assignment_6 cameraMovement.cpp)
+target_link_libraries(assignment_6 PRIVATE common)
