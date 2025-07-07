@@ -1,5 +1,6 @@
 #include "camera.h"
 #include "vec3.h"
+#include "mat3.h"
 #include "ray.h"
 #include "../util/transform.h"
 
@@ -12,6 +13,10 @@ Camera::Camera(float aspectRatio) : aspectRatio(aspectRatio)
     focalLength = 1.0f;
 }
 
+Camera::Camera(const vec3& eye, const vec3& right, const vec3& up, const vec3& forward, float aspectRatio, float focalLength)
+    : eye(eye), right(right), up(up), forward(forward), aspectRatio(aspectRatio), focalLength(focalLength)
+{}
+
 Camera::Camera(const vec3& eye, const vec3& target, const vec3& upVec, float aspectRatio, float focalLength)
        : eye(eye), aspectRatio(aspectRatio), focalLength(focalLength)
 {
@@ -19,6 +24,17 @@ Camera::Camera(const vec3& eye, const vec3& target, const vec3& upVec, float asp
    right = forward.cross(upVec).normalized();
    up = right.cross(forward).normalized();
 }
+
+vec3 Camera::getPosition() const
+{
+    return this->eye;
+}
+
+mat3 Camera::getOrientation() const
+{
+    return mat3(right, up, forward);
+}
+
 
 Ray Camera::generateRay(float u, float v) const
 {
@@ -78,6 +94,12 @@ void Camera::roll(float degrees)
     up = rotateZ(degrees) * up;
 }
 
+void Camera::transformBasis(mat3& rotationMatrix)
+{
+    right = rotationMatrix * right;
+    forward = rotationMatrix * forward;
+    up = rotationMatrix * up;
+}
 
 
 

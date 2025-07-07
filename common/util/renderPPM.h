@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <memory>
 #include "camera.h"
 #include "ray.h"
 #include "color.h"
@@ -11,7 +12,7 @@
 
 double EPSILON = 1e-6;
 
-void renderScene(std::string &filename, int width, int height, Camera& camera, const std::vector<Triangle*>& triangles)
+void renderScene(const std::string &filename, int width, int height, Camera& camera, const std::vector<Triangle>& triangles, Color bg)
 {
     std::ofstream out(filename);
     out << "P3\n" << width << ' ' << height << "\n255\n";
@@ -24,19 +25,19 @@ void renderScene(std::string &filename, int width, int height, Camera& camera, c
             float v = (y + 0.5f) / height;
 
             Ray ray = camera.generateRay(u, v);
+            Color pixelColor = bg;
 
             double shortest_intersection = 1/EPSILON;
-            Color *pixelColor = new Color(0, 0, 0);
 
-            for(Triangle* t: triangles) {
-                double p = t->intersect(ray);
+            for(const Triangle& t: triangles) {
+                double p = t.intersect(ray);
                 if (p < shortest_intersection && p > EPSILON) {
                     shortest_intersection = p;
-                    *pixelColor = t->color;
+                    pixelColor = t.color;
                 }
             }
 
-            out<<pixelColor->r<<" "<<pixelColor->g<<" "<<pixelColor->b<<"\n";
+            out<<pixelColor.r<<" "<<pixelColor.g<<" "<<pixelColor.b<<"\n";
         }
     }
 

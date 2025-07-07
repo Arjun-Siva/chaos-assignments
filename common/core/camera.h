@@ -2,16 +2,16 @@
 #define CAMERA_H
 
 #include "vec3.h"
+#include "mat3.h"
 #include "ray.h"
 
 class Camera
 {
 private:
     vec3 eye;
-
-    vec3 forward;
     vec3 right;
     vec3 up;
+    vec3 forward;
 
     float aspectRatio;
     float focalLength;
@@ -20,9 +20,15 @@ private:
 public:
     Camera(float aspectRatio);
 
+    Camera(const vec3& eye, const vec3& right, const vec3& up, const vec3& forward, float aspectRatio, float focalLength);
+
     Camera(const vec3& eye, const vec3& target, const vec3& upVec, float aspectRatio, float focalLength);
 
     Ray generateRay(float u, float v) const;
+
+    vec3 getPosition() const;
+
+    mat3 getOrientation() const;
 
     // movements
 
@@ -35,6 +41,8 @@ public:
     void pan(float degrees);
     void tilt(float degrees);
     void roll(float degrees);
+
+    void transformBasis(mat3& rotationMatrix);
 
 };
 

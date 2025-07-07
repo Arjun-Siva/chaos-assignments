@@ -5,12 +5,12 @@
 class Color
 {
 public:
-    unsigned int r;
-    unsigned int g;
-    unsigned int b;
+    float r;
+    float g;
+    float b;
 
     Color();
-    Color(unsigned int r, unsigned int g, unsigned b);
+    Color(int r, int g, int b);
 };
 
 #endif // COLOR_H

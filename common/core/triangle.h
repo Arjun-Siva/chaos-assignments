@@ -15,6 +15,7 @@ public:
     Triangle(const vec3 &a,const vec3 &b, const vec3 &c);
     Triangle(const vec3 &a,const vec3 &b, const vec3 &c, const Color &color);
     double intersect(const Ray& r) const;
+    void setColor(const Color& newColor);
 
 private:
     void computeNormal();

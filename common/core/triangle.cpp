@@ -41,3 +41,8 @@ double Triangle::intersect(const Ray &r) const {
 
     return t;
 }
+
+void Triangle::setColor(const Color& newColor)
+{
+    this->color = newColor;
+}
