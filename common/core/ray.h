@@ -6,9 +6,10 @@
 class Ray
 {
 public:
-    Ray(vec3 o, vec3 d);
     vec3 o; // origin
     vec3 d; // direction
+
+    Ray(const vec3& o, const vec3& d) : o(o), d(d) {};
 };
 
 #endif // RAY_H

@@ -35,6 +35,16 @@ mat3 Camera::getOrientation() const
     return mat3(right, up, forward);
 }
 
+void Camera::setOrientation(mat3& matrix)
+{
+//    this->right = vec3(matrix.rows[0].x, matrix.rows[1].x, matrix.rows[2].x);
+//    this->up = vec3(matrix.rows[0].y, matrix.rows[1].y, matrix.rows[2].y);
+//    this->forward = vec3(matrix.rows[0].z, matrix.rows[1].z, matrix.rows[2].z);
+    this->right = matrix.transpose() * this->right;
+    this->forward = matrix.transpose() * this->forward;
+    this->up = matrix.transpose() * this->up;
+}
+
 
 Ray Camera::generateRay(float u, float v) const
 {

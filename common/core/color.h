@@ -10,7 +10,11 @@ public:
     float b;
 
     Color();
-    Color(int r, int g, int b);
+    Color(float r, float g, float b);
+
+    Color operator*(float scalar) const;
+    friend Color operator*(float scalar, const Color& c);
+    Color operator+(const Color& other);
 };
 
 #endif // COLOR_H

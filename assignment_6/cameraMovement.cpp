@@ -18,19 +18,19 @@ int main() {
 
     // floor
     Triangle f0(vec3(-20,-1, 10), vec3(20, -1, 10), vec3(-10, -1.2, -100));
-    f0.color = Color(166, 163, 162);
+    f0.color = Color(166.0/255.0, 163.0/255.0, 162.0/255.0);
     triangles.push_back(f0);
 
     Triangle t1(vec3(-4, -1 ,-4), vec3(-2, -1, -5), vec3(-2, 2, -5));
-    t1.color = Color(79, 79, 78);
+    t1.color = Color(79.0f/255.0f, 79.0f/255.0f, 78.0f/255.0f);
     triangles.push_back(t1);
 
     Triangle t2(vec3(-2, 2, -5), vec3(-2, -1, -5), vec3(2, -1, -7));
-    t2.color = Color(0, 255, 0);
+    t2.color = Color(0, 1, 0);
     triangles.push_back(t2);
 
     Triangle t3(vec3(2, -1, -7), vec3(-4, -1 ,-4), vec3(-2, 2, -5));
-    t3.color = Color(0, 0, 255);
+    t3.color = Color(0, 0, 1);
     triangles.push_back(t3);
 
     Camera camera(width/height);

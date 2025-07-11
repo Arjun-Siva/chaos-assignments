@@ -7,6 +7,7 @@
 #include <iostream>
 
 
+
 int main() {
     const int width = 1920;
     const int height = 1080;
@@ -15,15 +16,15 @@ int main() {
     std::vector<Triangle*> triangles;
 
     Triangle t1(vec3(-2,1,-5), vec3(2, 1, -5), vec3(0, 3, -5));
-    t1.color = Color(255, 0, 0);
+    t1.color = Color(1, 0, 0);
     triangles.push_back(&t1);
 
     Triangle t2(vec3(0,2,-7), vec3(4, 2, -7), vec3(2, 5, -7));
-    t2.color = Color(0, 255, 0);
+    t2.color = Color(0, 1, 0);
     triangles.push_back(&t2);
 
     Triangle t3(vec3(-2,-1,-4), vec3(0, 2, -7), vec3(-1, 5, -7));
-    t3.color = Color(0, 0, 255);
+    t3.color = Color(0, 0, 1);
     triangles.push_back(&t3);
 
 
@@ -61,7 +62,7 @@ int main() {
                 }
             }
 
-            out<<pixelColor->r<<" "<<pixelColor->g<<" "<<pixelColor->b<<"\n";
+            out<<static_cast<int>(pixelColor->r * 255)<<" "<<static_cast<int>(pixelColor->g * 255)<<" "<<static_cast<int>(pixelColor->b * 255)<<"\n";
         }
     }
 

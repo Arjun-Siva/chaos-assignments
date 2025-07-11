@@ -12,3 +12,5 @@ add_subdirectory(assignment_4)
 add_subdirectory(assignment_5)
 add_subdirectory(assignment_6)
 add_subdirectory(assignment_7)
+add_subdirectory(assignment_8)
+

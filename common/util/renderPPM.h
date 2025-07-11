@@ -37,7 +37,7 @@ void renderScene(const std::string &filename, int width, int height, Camera& cam
                 }
             }
 
-            out<<pixelColor.r<<" "<<pixelColor.g<<" "<<pixelColor.b<<"\n";
+            out<<static_cast<int>(pixelColor.r * 255)<<" "<<static_cast<int>(pixelColor.g * 255)<<" "<<static_cast<int>(pixelColor.b * 255)<<"\n";
         }
     }
 

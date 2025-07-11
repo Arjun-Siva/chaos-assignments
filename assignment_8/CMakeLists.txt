@@ -1,0 +1,2 @@
+add_executable(assignment_8 sceneWithLights.cpp)
+target_link_libraries(assignment_8 PRIVATE common)

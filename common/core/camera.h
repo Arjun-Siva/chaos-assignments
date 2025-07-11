@@ -30,6 +30,8 @@ public:
 
     mat3 getOrientation() const;
 
+    void setOrientation(mat3& matrix);
+
     // movements
 
     // displacement
