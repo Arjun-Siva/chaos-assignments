@@ -5,6 +5,8 @@
 #include "ray.h"
 #include "color.h"
 
+#include <utility>
+
 class Triangle
 {
 public:
@@ -16,6 +18,7 @@ public:
     Triangle(const vec3 &a,const vec3 &b, const vec3 &c, const Color &color);
     double intersect(const Ray& r) const;
     void setColor(const Color& newColor);
+    vec3 getBaryCentricCoords(vec3& point);
 
 private:
     void computeNormal();

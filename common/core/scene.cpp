@@ -201,6 +201,7 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
             {
                 const auto& vertexArray = obj["vertices"].GetArray();
                 assert(vertexArray.Size() % 3 == 0);
+                mesh.vertices.reserve(vertexArray.Size() / 3);
 
                 for (unsigned int i = 0; i + 2 < vertexArray.Size(); i += 3)
                 {
@@ -217,6 +218,8 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
                 const auto& triangleArray = obj["triangles"].GetArray();
                 assert(triangleArray.Size() % 3 == 0);
 
+                mesh.triangleVertIndices.reserve(triangleArray.Size());
+
                 for (unsigned int i = 0; i + 2 < triangleArray.Size(); i += 3)
                 {
                     mesh.insertTriangleIndex(static_cast<int>(triangleArray[i].GetDouble()),
@@ -232,6 +235,7 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
             }
 
             mesh.computeTriangleNormals();
+            mesh.computeVertexNormals();
 
             this->addMesh(mesh);
         }

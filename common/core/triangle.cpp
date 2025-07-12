@@ -46,3 +46,21 @@ void Triangle::setColor(const Color& newColor)
 {
     this->color = newColor;
 }
+
+vec3 Triangle::getBaryCentricCoords(vec3& point)
+{
+    vec3 e01 = v1 - v0;
+    vec3 e02 = v2 - v0;
+
+    vec3 e0p = point - v0;
+
+    float area_tri = e01.cross(e02).length() / 2.0f;
+    float area_m = e0p.cross(e02).length() / 2.0f;
+    float area_n = e01.cross(e0p).length() / 2.0f;
+
+    float u = area_m / area_tri;
+    float v = area_n / area_tri;
+    float w = 1 - u - v;
+
+    return vec3(u, v, w);
+}

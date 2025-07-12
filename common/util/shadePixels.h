@@ -42,7 +42,6 @@ void shadePixels(const std::string &outputFile, Scene& scene)
             // find shortest intersecting triangle
             // find the point of intersection
             // get the normal of triangle
-            //
 
             vec3 hitPoint;
             vec3 hitNormal;

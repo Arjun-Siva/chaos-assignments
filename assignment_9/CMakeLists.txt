@@ -1,0 +1,2 @@
+add_executable(assignment_9 barycentricShading.cpp)
+target_link_libraries(assignment_9 PRIVATE common)

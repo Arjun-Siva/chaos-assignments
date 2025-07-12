@@ -34,6 +34,17 @@ void Mesh::insertTriangleIndex(int i0, int i1, int i2)
     triangleVertIndices.push_back(i2);
 }
 
+Triangle Mesh::getTriangleByIndex(const int index) const
+{
+    assert(index >= 0 && (unsigned long long)index < triangleVertIndices.size() / 3);
+
+    const vec3& v0 = vertices[triangleVertIndices[index*3]];
+    const vec3& v1 = vertices[triangleVertIndices[index*3 + 1]];
+    const vec3& v2 = vertices[triangleVertIndices[index*3 + 2]];
+
+    return Triangle(v0, v1, v2, uniformColor);
+}
+
 std::vector<Triangle> Mesh::generateTriangleList() const
 {
     assert((triangleVertIndices.size() % 3 == 0) && "Missing indices for triangles");
@@ -90,15 +101,43 @@ void Mesh::computeTriangleNormals()
     }
 }
 
+void Mesh::computeVertexNormals()
+{
+    // init vector's normals to 0,0,0
+    vertexNormals = std::vector<vec3>(vertices.size(), vec3(0, 0, 0));
+
+    // for each vertex v of the triangle
+    //  add the triangle t's normal to v
+    for (size_t i = 0; i < triangleVertIndices.size(); i += 3)
+    {
+        const int i0 = triangleVertIndices[i];
+        const int i1 = triangleVertIndices[i + 1];
+        const int i2 = triangleVertIndices[i + 2];
+
+        const vec3& triangleNormal = triangleNormals[i / 3];
+
+        vertexNormals[i0] = vertexNormals[i0] + triangleNormal;
+        vertexNormals[i1] = vertexNormals[i1] + triangleNormal;
+        vertexNormals[i2] = vertexNormals[i2] + triangleNormal;
+    }
+
+    // normalize all vector normals
+    for (vec3& norm : vertexNormals)
+    {
+        norm = norm.normalized();
+    }
+}
+
 double Mesh::intersectRay(const Ray& r, int& hitTriangleIndex, vec3& hitPoint, vec3& hitNormal, bool cullBackFaces) const
 {
     double minT = 1/EPSILON;
     hitTriangleIndex = -1;
 
-    for (size_t i = 0; i < triangleVertIndices.size(); i += 3) {
-        vec3 v0 = vertices[triangleVertIndices[i]];
-        vec3 v1 = vertices[triangleVertIndices[i + 1]];
-        vec3 v2 = vertices[triangleVertIndices[i + 2]];
+    for (size_t i = 0; i < triangleVertIndices.size(); i += 3)
+    {
+        const vec3& v0 = vertices[triangleVertIndices[i]];
+        const vec3& v1 = vertices[triangleVertIndices[i + 1]];
+        const vec3& v2 = vertices[triangleVertIndices[i + 2]];
         const vec3& normal = triangleNormals[i / 3];
 
         if (cullBackFaces && normal.dot(r.d) >= -EPSILON) continue; // backface culling
@@ -115,9 +154,9 @@ double Mesh::intersectRay(const Ray& r, int& hitTriangleIndex, vec3& hitPoint, v
         vec3 e12 = v2 - v1;
         vec3 e20 = v0 - v2;
 
-        if (normal.dot(e01.cross(p - v0)) < -EPSILON) continue;
-        if (normal.dot(e12.cross(p - v1)) < -EPSILON) continue;
-        if (normal.dot(e20.cross(p - v2)) < -EPSILON) continue;
+        if (normal.dot(e01.cross(p - v0)) < EPSILON) continue;
+        if (normal.dot(e12.cross(p - v1)) < EPSILON) continue;
+        if (normal.dot(e20.cross(p - v2)) < EPSILON) continue;
 
         minT = t;
         hitPoint = p;
