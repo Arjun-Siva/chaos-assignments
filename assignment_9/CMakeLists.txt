@@ -1,4 +1,6 @@
 add_executable(assignment_9_bary barycentricShading.cpp)
 add_executable(assignment_9_smooth smoothShading.cpp)
+add_executable(assignment_9_reflection reflectiveShading.cpp)
 target_link_libraries(assignment_9_bary PRIVATE common)
 target_link_libraries(assignment_9_smooth PRIVATE common)
+target_link_libraries(assignment_9_reflection PRIVATE common)

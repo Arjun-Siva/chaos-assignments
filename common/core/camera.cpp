@@ -65,7 +65,7 @@ Ray Camera::generateRay(float u, float v) const
     vec3 pixelPos = lowerLeft + horizontal * u + vertical * v;
     vec3 rayDir = (pixelPos - eye).normalized();
 
-    return Ray{ eye, rayDir };
+    return Ray{ eye, rayDir, RayType::camera, 1 };
 }
 
 void Camera::dolly(float distance)

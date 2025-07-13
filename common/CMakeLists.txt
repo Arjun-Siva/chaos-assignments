@@ -17,6 +17,7 @@ target_sources(common
         core/light.cpp
         util/transform.h
         util/renderPPM.h
+        util/recursiveShader.h
 )
 
 target_include_directories(common
