@@ -6,6 +6,7 @@
 #include "triangle.h"
 #include "light.h"
 #include "material.h"
+#include "intersectionData.h"
 #include <vector>
 #include <fstream>
 #include <iostream>
@@ -13,6 +14,8 @@
 
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
+
+const double EPSILON = 1e-6;
 
 using namespace rapidjson;
 
@@ -269,4 +272,60 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
             }
         }
     }
+}
+
+
+IntersectionData Scene::traceRay(const Ray &ray)
+{
+    // find shortest intersecting triangle
+    // find the point of intersection
+    // get the normal of triangle
+
+    IntersectionData iData;
+
+    vec3 hitPoint;
+    vec3 hitNormal;
+    int hitTriangleIdx;
+    int hitMeshIdx;
+    Material* hitMaterial = nullptr;
+    bool missedAllMeshes = true;
+    float shortestIntersection = std::numeric_limits<float>::max();
+
+    int meshIndex = 0;
+    for (Mesh& mesh : this->geometryObjects)
+    {
+        int meshHitTriIndex;
+        vec3 meshHitPoint;
+        vec3 meshHitNormal;
+
+        double t = mesh.intersectRay(ray, meshHitTriIndex, meshHitPoint, meshHitNormal, true);
+
+        // shorter hit than previous and not miss (not -1)
+        if (t < shortestIntersection && t > EPSILON)
+        {
+            shortestIntersection = t;
+            hitPoint = meshHitPoint;
+            hitNormal = meshHitNormal;
+            hitMaterial = &mesh.material;
+            hitTriangleIdx = meshHitTriIndex;
+            missedAllMeshes = false;
+            hitMeshIdx = meshIndex;
+        }
+        meshIndex++;
+    }
+
+    if (!missedAllMeshes)
+    {
+        iData.hitPoint = hitPoint;
+        iData.hitPointNormal = hitNormal;
+        iData.material = hitMaterial;
+        iData.objectIdx = hitMeshIdx;
+        iData.triangleIdx = hitTriangleIdx;
+
+        iData.baryCentricCoords = this->geometryObjects[hitMeshIdx].findBaryCentricCoords(hitPoint, hitTriangleIdx);
+        iData.interpolatedVertNormal = this->geometryObjects[hitMeshIdx].findInterpolatedVertNormal(iData.baryCentricCoords, hitTriangleIdx);
+
+    }
+
+    return iData;
 }

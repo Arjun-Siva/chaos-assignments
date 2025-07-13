@@ -1,6 +1,7 @@
 #include "mesh.h"
 #include "vec3.h"
 #include "triangle.h"
+#include "baryCoord.h"
 #include <cstdlib>
 #include <vector>
 #include <cassert>
@@ -165,4 +166,37 @@ double Mesh::intersectRay(const Ray& r, int& hitTriangleIndex, vec3& hitPoint, v
     }
 
     return (hitTriangleIndex != -1) ? minT : -1.0;
+}
+
+
+BaryCoord Mesh::findBaryCentricCoords(vec3& point, int triangleIndex) const
+{
+    assert((size_t)(triangleIndex*3 + 2) < this->triangleVertIndices.size());
+    const vec3& v0 = this->vertices[this->triangleVertIndices[triangleIndex*3]];
+    const vec3& v1 = this->vertices[this->triangleVertIndices[triangleIndex*3 + 1]];
+    const vec3& v2 = this->vertices[this->triangleVertIndices[triangleIndex*3 + 2]];
+    vec3 e01 = v1 - v0;
+    vec3 e02 = v2 - v0;
+
+    vec3 e0p = point - v0;
+
+    float area_tri = e01.cross(e02).length() / 2.0f;
+    float area_m = e0p.cross(e02).length() / 2.0f;
+    float area_n = e01.cross(e0p).length() / 2.0f;
+
+    float u = area_m / area_tri;
+    float v = area_n / area_tri;
+    float w = 1 - u - v;
+
+    return BaryCoord(u, v, w);
+}
+
+vec3 Mesh::findInterpolatedVertNormal(BaryCoord& baryCentCoords, int triangleIndex) const
+{
+    assert((size_t)(triangleIndex*3 + 2) < this->triangleVertIndices.size());
+    const vec3& n0 = this->vertexNormals[this->triangleVertIndices[triangleIndex*3]];
+    const vec3& n1 = this->vertexNormals[this->triangleVertIndices[triangleIndex*3 + 1]];
+    const vec3& n2 = this->vertexNormals[this->triangleVertIndices[triangleIndex*3 + 2]];
+
+    return n0*baryCentCoords.w + n1*baryCentCoords.u + n2*baryCentCoords.v;
 }

@@ -5,6 +5,7 @@
 #include "triangle.h"
 #include "color.h"
 #include "material.h"
+#include "baryCoord.h"
 #include <vector>
 
 class Mesh
@@ -21,6 +22,8 @@ public:
     void setMaterial(const Material& material);
     void computeTriangleNormals();
     void computeVertexNormals();
+    BaryCoord findBaryCentricCoords(vec3& point, int triangleIndex) const;
+    vec3 findInterpolatedVertNormal(BaryCoord& baryCentricCoord, int triangleIndex) const;
     double intersectRay(const Ray& r, int& hitTriangleIndex, vec3& hitPoint, vec3& hitNormal, bool cullBackFaces) const;
 
     Color uniformColor;

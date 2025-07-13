@@ -12,6 +12,8 @@ target_sources(common
         core/mesh.cpp
         core/scene.cpp
         core/material.cpp
+        core/baryCoord.h
+        core/intersectionData.h
         core/light.cpp
         util/transform.h
         util/renderPPM.h

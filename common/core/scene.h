@@ -6,6 +6,8 @@
 #include "color.h"
 #include "light.h"
 #include "material.h"
+#include "ray.h"
+#include "intersectionData.h"
 #include <vector>
 
 class Scene
@@ -28,6 +30,8 @@ public:
     void parseSceneFile(const std::string& sceneFileName);
     void addLight(Light& light);
     void addMaterial(Material& material);
+    IntersectionData traceRay(const Ray& ray);
+
 };
 
 #endif // SCENE_H
