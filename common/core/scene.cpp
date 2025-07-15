@@ -161,9 +161,9 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
                 {
                     currentMaterial.type = MaterialType::Refractive;
                 }
-                else if (matType == "phong")
+                else if (matType == "constant")
                 {
-                    currentMaterial.type = MaterialType::Phong;
+                    currentMaterial.type = MaterialType::Constant;
                 }
 
             }
@@ -183,6 +183,11 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
             if (material.HasMember("smooth_shading") && material["smooth_shading"].IsBool())
             {
                 currentMaterial.smoothShading = material["smooth_shading"].GetBool();
+            }
+
+            if (material.HasMember("ior") && material["ior"].IsDouble())
+            {
+                currentMaterial.ior = static_cast<float>(material["ior"].GetDouble());
             }
 
             this->addMaterial(currentMaterial);
@@ -291,6 +296,8 @@ IntersectionData Scene::traceRay(const Ray &ray)
     bool missedAllMeshes = true;
     float shortestIntersection = std::numeric_limits<float>::max();
 
+    bool cullBackfaces = ray.type == RayType::refractive ? false : true;
+
     int meshIndex = 0;
     for (Mesh& mesh : this->geometryObjects)
     {
@@ -298,7 +305,7 @@ IntersectionData Scene::traceRay(const Ray &ray)
         vec3 meshHitPoint;
         vec3 meshHitNormal;
 
-        double t = mesh.intersectRay(ray, meshHitTriIndex, meshHitPoint, meshHitNormal, true);
+        double t = mesh.intersectRay(ray, meshHitTriIndex, meshHitPoint, meshHitNormal, cullBackfaces);
 
         // shorter hit than previous and not miss (not -1)
         if (t < shortestIntersection && t > EPSILON)

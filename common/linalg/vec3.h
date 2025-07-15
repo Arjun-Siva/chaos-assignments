@@ -13,6 +13,7 @@ public:
     vec3 operator+(const vec3& v) const;
     vec3 operator-(const vec3& v) const;
     vec3 operator*(float t) const;
+    friend vec3 operator*(float t, const vec3& v);
     vec3 operator/(float t) const;
     friend std::ostream& operator<<(std::ostream& os, const vec3& v);
 

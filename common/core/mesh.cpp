@@ -65,9 +65,9 @@ std::vector<Triangle> Mesh::generateTriangleList() const
 
         if (this->randomizeColors)
         {
-            int r = rand() % 256;
-            int g = rand() % 256;
-            int b = rand() % 256;
+            float r = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);//rand() % 256;
+            float g = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);//rand() % 256;
+            float b = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);//rand() % 256;
 
             color = Color(r, g, b);
         }
@@ -134,20 +134,25 @@ double Mesh::intersectRay(const Ray& r, int& hitTriangleIndex, vec3& hitPoint, v
     double minT = 1/EPSILON;
     hitTriangleIndex = -1;
 
+    // if the mesh's material is refractive, all the triangles in it can be ignored for shadow ray
+    if (r.type == RayType::shadow && this->material.type == MaterialType::Refractive)
+        return -1.0;
+
     for (size_t i = 0; i < triangleVertIndices.size(); i += 3)
     {
         const vec3& v0 = vertices[triangleVertIndices[i]];
         const vec3& v1 = vertices[triangleVertIndices[i + 1]];
         const vec3& v2 = vertices[triangleVertIndices[i + 2]];
-        const vec3& normal = triangleNormals[i / 3];
+        vec3 normal = triangleNormals[i / 3];
 
-        if (cullBackFaces && normal.dot(r.d) >= -EPSILON) continue; // backface culling
+        if (cullBackFaces && normal.dot(r.d) > -EPSILON) continue; // backface culling
 
-        double denom = normal.dot(r.d);
-        if (std::abs(denom) < EPSILON) continue; // parallel
+        // proj is negative if the normal and ray are in opposite direction. positive if the directions are same
+        double proj = normal.dot(r.d);
+        if (std::abs(proj) < EPSILON) continue; // parallel (normal is perpendicular to ray)
 
-        double t = -normal.dot(r.o - v0) / denom;
-        if (t < 0 || t > minT) continue; // opposite direction
+        double t = normal.dot(v0 - r.o) / proj;
+        //if (t < 0 || t > minT) continue; // opposite direction
 
         vec3 p = r.o + r.d * t;
 
@@ -155,9 +160,9 @@ double Mesh::intersectRay(const Ray& r, int& hitTriangleIndex, vec3& hitPoint, v
         vec3 e12 = v2 - v1;
         vec3 e20 = v0 - v2;
 
-        if (normal.dot(e01.cross(p - v0)) < EPSILON) continue;
-        if (normal.dot(e12.cross(p - v1)) < EPSILON) continue;
-        if (normal.dot(e20.cross(p - v2)) < EPSILON) continue;
+        if (normal.dot(e01.cross(p - v0)) < -EPSILON) continue;
+        if (normal.dot(e12.cross(p - v1)) < -EPSILON) continue;
+        if (normal.dot(e20.cross(p - v2)) < -EPSILON) continue;
 
         minT = t;
         hitPoint = p;

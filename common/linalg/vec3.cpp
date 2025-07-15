@@ -21,6 +21,10 @@ vec3 vec3::operator/(float t) const {
     return vec3(x / t, y / t, z / t);
 }
 
+vec3 operator*(float t, const vec3& v) {
+    return vec3(v.x * t, v.y * t, v.z * t);
+}
+
 std::ostream& operator<<(std::ostream& os, const vec3& v)  {
     os << "(" << v.x << ", " << v.y << ", " << v.z << ")";
     return os;

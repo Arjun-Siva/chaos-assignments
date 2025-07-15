@@ -9,7 +9,7 @@ enum class MaterialType {
     Diffuse,
     Reflective,
     Refractive,
-    Phong
+    Constant
 };
 
 class Material {
@@ -17,9 +17,11 @@ public:
     Color albedo;
     MaterialType type;
     bool smoothShading;
+    float ior;
 
     Material();
     Material(const Color& albedo, MaterialType type, bool doSmoothShading);
+    Material(const Color& albedo, MaterialType type, bool doSmoothShading, float ior);
 };
 
 #endif // MATERIAL_H

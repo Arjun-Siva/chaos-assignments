@@ -15,9 +15,13 @@ target_sources(common
         core/baryCoord.h
         core/intersectionData.h
         core/light.cpp
+        shader/diffuseShader.cpp
+        shader/refractiveShader.cpp
+        shader/reflectiveShader.cpp
+        shader/constantShader.cpp
+        shader/recursiveShader.cpp
         util/transform.h
         util/renderPPM.h
-        util/recursiveShader.h
 )
 
 target_include_directories(common
@@ -27,4 +31,5 @@ target_include_directories(common
         ${CMAKE_CURRENT_SOURCE_DIR}/linalg
         ${CMAKE_CURRENT_SOURCE_DIR}/util
         ${CMAKE_CURRENT_SOURCE_DIR}/rapidjson
+        ${CMAKE_CURRENT_SOURCE_DIR}/shader
 )

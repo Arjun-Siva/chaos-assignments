@@ -1,0 +1,2 @@
+add_executable(assignment_11 refractiveShading.cpp)
+target_link_libraries(assignment_11 PRIVATE common)

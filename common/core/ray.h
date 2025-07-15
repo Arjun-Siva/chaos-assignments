@@ -20,11 +20,11 @@ public:
     RayType type;
     int pathDepth;
 
-    Ray(const vec3& o, const vec3& d) : o(o), d(d) {};
+    Ray(const vec3& o, const vec3& d) : o(o), d(d), type(RayType::camera), pathDepth(1) {};
 
     Ray(const vec3& o, const vec3& d, RayType type, int pathDepth) : o(o), d(d), type(type), pathDepth(pathDepth) {};
 
-    Ray reflectedRay(vec3& normal, vec3& point) const
+    Ray reflectedRay(const vec3& normal, const vec3& point) const
     {
         vec3 newD = this->d - (normal * (this->d.dot(normal)) * 2);
         return Ray(point, newD.normalized(), this->type, this->pathDepth + 1);

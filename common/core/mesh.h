@@ -12,7 +12,6 @@ class Mesh
 {
 public:
     Mesh();
-    // TODO: reserve space before insertion
     void insertVertex(float v0, float v1, float v2);
     void insertTriangleIndex(int i0, int i1, int i2);
     Triangle getTriangleByIndex(const int index) const;
