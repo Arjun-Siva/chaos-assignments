@@ -145,14 +145,14 @@ double Mesh::intersectRay(const Ray& r, int& hitTriangleIndex, vec3& hitPoint, v
         const vec3& v2 = vertices[triangleVertIndices[i + 2]];
         vec3 normal = triangleNormals[i / 3];
 
-        if (cullBackFaces && normal.dot(r.d) > -EPSILON) continue; // backface culling
+        if (cullBackFaces && normal.dot(r.d) > EPSILON) continue; // backface culling
 
         // proj is negative if the normal and ray are in opposite direction. positive if the directions are same
         double proj = normal.dot(r.d);
         if (std::abs(proj) < EPSILON) continue; // parallel (normal is perpendicular to ray)
 
         double t = normal.dot(v0 - r.o) / proj;
-        //if (t < 0 || t > minT) continue; // opposite direction
+        if (t < 0 || t > minT) continue; // opposite direction
 
         vec3 p = r.o + r.d * t;
 
@@ -160,9 +160,11 @@ double Mesh::intersectRay(const Ray& r, int& hitTriangleIndex, vec3& hitPoint, v
         vec3 e12 = v2 - v1;
         vec3 e20 = v0 - v2;
 
+
         if (normal.dot(e01.cross(p - v0)) < -EPSILON) continue;
         if (normal.dot(e12.cross(p - v1)) < -EPSILON) continue;
         if (normal.dot(e20.cross(p - v2)) < -EPSILON) continue;
+
 
         minT = t;
         hitPoint = p;

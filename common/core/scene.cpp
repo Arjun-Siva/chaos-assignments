@@ -296,8 +296,6 @@ IntersectionData Scene::traceRay(const Ray &ray)
     bool missedAllMeshes = true;
     float shortestIntersection = std::numeric_limits<float>::max();
 
-    bool cullBackfaces = ray.type == RayType::refractive ? false : true;
-
     int meshIndex = 0;
     for (Mesh& mesh : this->geometryObjects)
     {
@@ -305,10 +303,12 @@ IntersectionData Scene::traceRay(const Ray &ray)
         vec3 meshHitPoint;
         vec3 meshHitNormal;
 
+        bool cullBackfaces = mesh.material.type == MaterialType::Refractive ? false : true;
+
         double t = mesh.intersectRay(ray, meshHitTriIndex, meshHitPoint, meshHitNormal, cullBackfaces);
 
         // shorter hit than previous and not miss (not -1)
-        if (t < shortestIntersection && t > EPSILON)
+        if (t < shortestIntersection && t > -EPSILON)
         {
             shortestIntersection = t;
             hitPoint = meshHitPoint;

@@ -48,8 +48,8 @@ int main(int argc, char* argv[]) {
 
     Scene scene(sceneFileName);
 
-//    scene.height = 480;
-//    scene.width = 852;
+    scene.height = 480;
+    scene.width = 852;
 
     for(Mesh& mesh : scene.geometryObjects)
     {

@@ -11,7 +11,7 @@ struct IntersectionData
     vec3 hitPointNormal; //triangle face normal
     vec3 interpolatedVertNormal; // interpolated normal from barycentric coords
     BaryCoord baryCentricCoords;
-    const Material* material = nullptr;
+    const Material* material;
     int objectIdx = -1;
     int triangleIdx = -1;
 };
