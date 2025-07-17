@@ -45,16 +45,12 @@ Color refractiveShader(const Ray& ray, const IntersectionData& intersectData, Sc
         vec3 R = A + B;
 
         Ray refractionRay(intersectData.hitPoint + (-1* normal * REFRACTION_BIAS), R, RayType::refractive, ray.pathDepth + 1);
-
         Color refractionColor = recursiveShader(refractionRay, scene, max_depth);
 
-
         Ray reflectionRay = ray.reflectedRay(normal, intersectData.hitPoint + (normal * REFLECTION_BIAS));
-
         Color reflectionColor = recursiveShader(reflectionRay, scene, max_depth);
 
-         float fresnel = 0.5 * std::pow(1.0 + dotIN, 5.0f);
-
+        float fresnel = 0.5 * std::pow(1.0 + dotIN, 5.0f);
         return (fresnel * reflectionColor) + ((1.0 - fresnel) * refractionColor);
     }
 

@@ -5,6 +5,7 @@
 #include "scene.h"
 #include "camera.h"
 #include "triangle.h"
+#include "clamp.h"
 #include "intersectionData.h"
 #include "recursiveShader.h"
 
@@ -30,7 +31,7 @@ void shadeRefract(const std::string &outputFile, Scene& scene)
 
             Color pixelColor = recursiveShader(ray, scene, 5);
 
-            out<<static_cast<int>(pixelColor.r * 255)<<" "<<static_cast<int>(pixelColor.g * 255)<<" "<<static_cast<int>(pixelColor.b * 255)<<"\n";
+            out<<static_cast<int>(clamp(pixelColor.r * 255, 0.f, 255.f))<<" "<<static_cast<int>(clamp(pixelColor.g * 255, 0.f, 255.f))<<" "<<static_cast<int>(clamp(pixelColor.b * 255, 0.f, 255.f))<<"\n";
         } // x loop end
     } // y loop end
 
@@ -39,18 +40,17 @@ void shadeRefract(const std::string &outputFile, Scene& scene)
 
 
 int main(int argc, char* argv[]) {
-//    if (argc < 2) {
-//        std::cerr << "Usage: " << argv[0] << " <scene_file.crtScene>\n";
-//        return 1;
-//    }
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <scene_file.crtScene>\n";
+        return 1;
+    }
 
-//    std::string sceneFileName = argv[1];
-
-    for(int i = 0; i < 9; i++) {
-
-        std::string sceneFileName = "scene" + std::to_string(i) + ".crtscene";
+    std::string sceneFileName = argv[1];
 
     Scene scene(sceneFileName);
+
+        scene.height = 480;
+        scene.width = 852;
 
     for(Mesh& mesh : scene.geometryObjects)
     {
@@ -59,8 +59,7 @@ int main(int argc, char* argv[]) {
 
     shadeRefract(sceneFileName.substr(0, sceneFileName.find_last_of('.'))+"_refract.ppm", scene);
 
-    std::cout<<"Scene " + std::to_string(i) + ": Render completed"<<std::endl;
-    }
+    std::cout<<"Render completed"<<std::endl;
 
 
     return 0;

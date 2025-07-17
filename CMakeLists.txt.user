@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.13.1, 2025-07-17T00:38:50. -->
+<!-- Written by QtCreator 4.13.1, 2025-07-17T11:10:36. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -888,7 +888,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">assignment_11</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.CMakeRunConfiguration.assignment_11</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">assignment_11</value>
-    <value type="QString" key="RunConfiguration.Arguments">scene4.crtscene</value>
+    <value type="QString" key="RunConfiguration.Arguments">scene8.crtscene</value>
     <value type="bool" key="RunConfiguration.Arguments.multi">false</value>
     <value type="QString" key="RunConfiguration.OverrideDebuggerStartup"></value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
