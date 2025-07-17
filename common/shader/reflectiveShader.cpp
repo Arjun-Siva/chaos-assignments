@@ -3,7 +3,7 @@
 #include "intersectionData.h"
 #include "recursiveShader.h"
 
-const double REFLECTION_BIAS = 1e-2;
+const double REFLECTION_BIAS = 1e-3;
 
 Color reflectiveShader(const Ray& ray, const IntersectionData& intersectData, Scene& scene, int max_depth)
 {

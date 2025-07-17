@@ -26,7 +26,7 @@ public:
 
     Ray reflectedRay(const vec3& normal, const vec3& point) const
     {
-        vec3 newD = this->d - (normal * (this->d.dot(normal)) * 2);
+        vec3 newD = this->d - (normal * (this->d.dot(normal)) * 2.f);
         return Ray(point, newD.normalized(), this->type, this->pathDepth + 1);
     }
 };

@@ -39,17 +39,18 @@ void shadeRefract(const std::string &outputFile, Scene& scene)
 
 
 int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <scene_file.crtScene>\n";
-        return 1;
-    }
+//    if (argc < 2) {
+//        std::cerr << "Usage: " << argv[0] << " <scene_file.crtScene>\n";
+//        return 1;
+//    }
 
-    std::string sceneFileName = argv[1];
+//    std::string sceneFileName = argv[1];
+
+    for(int i = 0; i < 9; i++) {
+
+        std::string sceneFileName = "scene" + std::to_string(i) + ".crtscene";
 
     Scene scene(sceneFileName);
-
-    scene.height = 480;
-    scene.width = 852;
 
     for(Mesh& mesh : scene.geometryObjects)
     {
@@ -58,7 +59,9 @@ int main(int argc, char* argv[]) {
 
     shadeRefract(sceneFileName.substr(0, sceneFileName.find_last_of('.'))+"_refract.ppm", scene);
 
-    std::cout<<"Render completed"<<std::endl;
+    std::cout<<"Scene " + std::to_string(i) + ": Render completed"<<std::endl;
+    }
+
 
     return 0;
 }
