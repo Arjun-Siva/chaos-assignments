@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "triangle.h"
 #include "intersectionData.h"
+#include "recursiveShader.h"
 
 
 double EPSILON = 1e-6;
@@ -15,7 +16,6 @@ void shadeSmooth(const std::string &outputFile, Scene& scene)
     int width = scene.width;
     int height = scene.height;
     Camera camera = scene.camera;
-    Color bg = scene.bgColor;
 
     std::ofstream out(outputFile);
     out << "P3\n" << width << ' ' << height << "\n255\n";
@@ -29,67 +29,69 @@ void shadeSmooth(const std::string &outputFile, Scene& scene)
             float v = (y + 0.5f) / height;
 
             Ray ray = camera.generateRay(u, v);
-            Color pixelColor = bg;
+//            Color pixelColor = bg;
 
-            IntersectionData iData = scene.traceRay(ray);
+//            IntersectionData iData = scene.traceRay(ray);
 
-            if (iData.triangleIdx != -1)
-            {
-                // Shadow ray
-                vec3 shadowOrigin = iData.hitPoint + iData.hitPointNormal*1e-3f;
-                pixelColor = Color(0, 0, 0);
+//            if (iData.triangleIdx != -1)
+//            {
+//                // Shadow ray
+//                vec3 shadowOrigin = iData.hitPoint + iData.hitPointNormal*1e-3f;
+//                pixelColor = Color(0, 0, 0);
 
-                for (const Light& light : scene.lights)
-                {
-                    vec3 shadowDir = (light.getPosition() - shadowOrigin).normalized();
+//                for (const Light& light : scene.lights)
+//                {
+//                    vec3 shadowDir = (light.getPosition() - shadowOrigin).normalized();
 
-                    Ray shadowRay = Ray(shadowOrigin, shadowDir);
+//                    Ray shadowRay = Ray(shadowOrigin, shadowDir);
 
-                    vec3 shadowHitPoint;
-                    vec3 shadowDHitNormal;
-                    int shadownHitTriangleIndex;
-                    double distanceToLight = (light.getPosition() - shadowOrigin).length();
-                    bool shadowReachLight = true;
+//                    vec3 shadowHitPoint;
+//                    vec3 shadowDHitNormal;
+//                    int shadownHitTriangleIndex;
+//                    double distanceToLight = (light.getPosition() - shadowOrigin).length();
+//                    bool shadowReachLight = true;
 
-                    for (const Mesh& mesh : scene.geometryObjects)
-                    {
-                        double st = mesh.intersectRay(shadowRay, shadownHitTriangleIndex, shadowHitPoint, shadowDHitNormal, false);
-                        // intersection before reaching light
-                        if (st < distanceToLight && st > EPSILON)
-                        {
-                            shadowReachLight = false;
-                            break;
-                        }
-                    }
+//                    for (const Mesh& mesh : scene.geometryObjects)
+//                    {
+//                        double st = mesh.intersectRay(shadowRay, shadownHitTriangleIndex, shadowHitPoint, shadowDHitNormal, false);
+//                        // intersection before reaching light
+//                        if (st < distanceToLight && st > EPSILON)
+//                        {
+//                            shadowReachLight = false;
+//                            break;
+//                        }
+//                    }
 
-                    // add contribution of each light
-                    if (shadowReachLight)
-                    {
-                        vec3 lightDir = light.getPosition() - iData.hitPoint;
-                        float sphereRadius = lightDir.length();
+//                    // add contribution of each light
+//                    if (shadowReachLight)
+//                    {
+//                        vec3 lightDir = light.getPosition() - iData.hitPoint;
+//                        float sphereRadius = lightDir.length();
 
-                        float cosLaw = 0;
-                        lightDir = lightDir.normalized();
-                        if (iData.material->smoothShading)
-                            cosLaw = std::max(0.0f, lightDir.dot(iData.interpolatedVertNormal));
-                        else
-                            cosLaw = std::max(0.0f, lightDir.dot(iData.hitPointNormal));
+//                        float cosLaw = 0;
+//                        lightDir = lightDir.normalized();
+//                        if (iData.material->smoothShading)
+//                            cosLaw = std::max(0.0f, lightDir.dot(iData.interpolatedVertNormal));
+//                        else
+//                            cosLaw = std::max(0.0f, lightDir.dot(iData.hitPointNormal));
 
-                        float albedoR = iData.material->albedo.r;
-                        float albedoG = iData.material->albedo.g;
-                        float albedoB = iData.material->albedo.b;
+//                        float albedoR = iData.material->albedo.r;
+//                        float albedoG = iData.material->albedo.g;
+//                        float albedoB = iData.material->albedo.b;
 
-                        float sphereArea = 4.0f * M_PI * sphereRadius * sphereRadius;
+//                        float sphereArea = 4.0f * M_PI * sphereRadius * sphereRadius;
 
-                        float rContrib = scene.geometryObjects[iData.objectIdx].uniformColor.r * albedoR;
-                        float gContrib = scene.geometryObjects[iData.objectIdx].uniformColor.g * albedoG;
-                        float bContrib = scene.geometryObjects[iData.objectIdx].uniformColor.b * albedoB;
+//                        float rContrib = scene.geometryObjects[iData.objectIdx].uniformColor.r * albedoR;
+//                        float gContrib = scene.geometryObjects[iData.objectIdx].uniformColor.g * albedoG;
+//                        float bContrib = scene.geometryObjects[iData.objectIdx].uniformColor.b * albedoB;
 
-                        pixelColor = pixelColor + (Color(rContrib, gContrib, bContrib) * (cosLaw/sphereArea)) * light.getIntensity();
-                    }
+//                        pixelColor = pixelColor + (Color(rContrib, gContrib, bContrib) * (cosLaw/sphereArea)) * light.getIntensity();
+//                    }
 
-                } // lights loop end
-            } // missedAllLights if end
+//                } // lights loop end
+//            } // missedAllLights if end
+
+            Color pixelColor = recursiveShader(ray, scene, 5);
 
             out<<static_cast<int>(pixelColor.r * 255)<<" "<<static_cast<int>(pixelColor.g * 255)<<" "<<static_cast<int>(pixelColor.b * 255)<<"\n";
         } // x loop end

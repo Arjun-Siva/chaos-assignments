@@ -18,7 +18,7 @@ Color recursiveShader(const Ray &ray, Scene& scene, int max_depth)
         return pixelColor;
     }
 
-    const IntersectionData iData = scene.traceRay(ray);
+    IntersectionData iData = scene.traceRay(ray);
 
     // no hit
     if(iData.triangleIdx == -1)

@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
     {
         mesh.setUniformColor(Color(1.0, 0.0, 1.0));
         Material mat = Material();
-        mat.albedo = Color(0.5, 0.5, 0.5);
+//        mat.albedo = Color(0.5, 0.5, 0.5);
         mesh.setMaterial(mat);
     }
 

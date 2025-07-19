@@ -198,6 +198,7 @@ BaryCoord Mesh::findBaryCentricCoords(vec3& point, int triangleIndex) const
     return BaryCoord(u, v, w);
 }
 
+
 vec3 Mesh::findInterpolatedVertNormal(BaryCoord& baryCentCoords, int triangleIndex) const
 {
     assert((size_t)(triangleIndex*3 + 2) < this->triangleVertIndices.size());
@@ -206,4 +207,38 @@ vec3 Mesh::findInterpolatedVertNormal(BaryCoord& baryCentCoords, int triangleInd
     const vec3& n2 = this->vertexNormals[this->triangleVertIndices[triangleIndex*3 + 2]];
 
     return n0*baryCentCoords.w + n1*baryCentCoords.u + n2*baryCentCoords.v;
+}
+
+
+void Mesh::insertVectorUVs(float u, float v, float w)
+{
+    const vec3 vertex_uv =  vec3(u, v, w);
+    this->vertexUVs.push_back(vertex_uv);
+}
+
+
+Color Mesh::getAlbedo(BaryCoord& baryPoint, int triangleIndex)
+{
+    int vertId0 = this->triangleVertIndices[triangleIndex*3];
+    int vertId1 = this->triangleVertIndices[triangleIndex*3 + 1];
+    int vertId2 = this->triangleVertIndices[triangleIndex*3 + 2];
+
+    // in older programs vertexUVs are empty
+
+    vec3 uv0 = vec3(0.f, 0.f, 0.f);
+    vec3 uv1 = vec3(0.f, 0.f, 0.f);
+    vec3 uv2 = vec3(0.f, 0.f, 0.f);
+
+    if (!this->vertexUVs.empty())
+    {
+        uv0 = this->vertexUVs[vertId0];
+        uv1 = this->vertexUVs[vertId1];
+        uv2 = this->vertexUVs[vertId2];
+    }
+
+    // only u and v needed for texture coordinate
+    float u = baryPoint.u * uv1.x + baryPoint.v * uv2.x + baryPoint.w * uv0.x;
+    float v = baryPoint.u * uv1.y + baryPoint.v * uv2.y + baryPoint.w * uv0.y;
+
+    return this->material.albedoTex->getTextureAlbedo(u, v, baryPoint);
 }

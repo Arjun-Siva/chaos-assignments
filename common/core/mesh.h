@@ -24,6 +24,8 @@ public:
     BaryCoord findBaryCentricCoords(vec3& point, int triangleIndex) const;
     vec3 findInterpolatedVertNormal(BaryCoord& baryCentricCoord, int triangleIndex) const;
     double intersectRay(const Ray& r, int& hitTriangleIndex, vec3& hitPoint, vec3& hitNormal, bool cullBackFaces) const;
+    Color getAlbedo(BaryCoord& baryPoint, int triangleIndex);
+    void insertVectorUVs(float u, float v, float w);
 
     Color uniformColor;
     bool randomizeColors;
@@ -32,6 +34,7 @@ public:
     std::vector<vec3> triangleNormals;
     std::vector<vec3> vertexNormals;
     Material material;
+    std::vector<vec3> vertexUVs;
 
 };
 

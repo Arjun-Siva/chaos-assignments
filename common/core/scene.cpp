@@ -7,6 +7,11 @@
 #include "light.h"
 #include "material.h"
 #include "intersectionData.h"
+#include "albedoTexture.h"
+#include "checkerTexture.h"
+#include "edgeTexture.h"
+#include "bitmapTexture.h"
+
 #include <vector>
 #include <fstream>
 #include <iostream>
@@ -136,10 +141,118 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
 
     }
 
+    // Textures
+    if (doc.HasMember("textures") && doc["textures"].IsArray())
+    {
+        const auto& textures = doc.FindMember("textures")->value;
+        for (const auto& texture: textures.GetArray())
+        {
+            if (texture.HasMember("type") && texture.HasMember("name"))
+            {
+                std::string texType = texture["type"].GetString();
+                std::string name = texture["name"].GetString();
+
+                if (texType == "albedo")
+                {
+                    if (texture.HasMember("albedo") && texture["albedo"].IsArray())
+                    {
+                        const auto& albedoArr = texture["albedo"].GetArray();
+                        assert(albedoArr.Size() == 3);
+
+                        float a0 = static_cast<float>(albedoArr[0].GetDouble());
+                        float a1 = static_cast<float>(albedoArr[1].GetDouble());
+                        float a2 = static_cast<float>(albedoArr[2].GetDouble());
+
+                        const auto& albedo = Color(a0, a1, a2);
+
+                        this->textureMap[name] = std::make_shared<AlbedoTexture>(name, albedo);
+                    }
+                }
+
+                else if (texType == "edges")
+                {
+                    if (texture.HasMember("edge_color") && texture.HasMember("inner_color") & texture["edge_color"].IsArray() & texture["inner_color"].IsArray())
+                    {
+                        const auto& edgeColor = texture["edge_color"].GetArray();
+                        assert(edgeColor.Size() == 3);
+
+                        float ec0 = static_cast<float>(edgeColor[0].GetDouble());
+                        float ec1 = static_cast<float>(edgeColor[1].GetDouble());
+                        float ec2 = static_cast<float>(edgeColor[2].GetDouble());
+
+                        const auto& edge_color = Color(ec0, ec1, ec2);
+
+                        const auto& innerColor = texture["inner_color"].GetArray();
+                        assert(innerColor.Size() == 3);
+
+                        float ic0 = static_cast<float>(innerColor[0].GetDouble());
+                        float ic1 = static_cast<float>(innerColor[1].GetDouble());
+                        float ic2 = static_cast<float>(innerColor[2].GetDouble());
+
+                        const auto& inner_color = Color(ic0, ic1, ic2);
+
+                        if (texture.HasMember("edge_width") && texture["edge_width"].IsFloat())
+                        {
+                            float edge_width = texture["edge_width"].GetFloat();
+
+                            this->textureMap[name] = std::make_shared<EdgeTexture>(name, inner_color, edge_color, edge_width);
+                        }
+                    }
+                }
+
+                else if (texType == "checker")
+                {
+                    if (texture.HasMember("color_A") && texture.HasMember("color_B") & texture["color_A"].IsArray() & texture["color_B"].IsArray())
+                    {
+                        const auto& colorA = texture["color_A"].GetArray();
+                        assert(colorA.Size() == 3);
+
+                        float a0 = static_cast<float>(colorA[0].GetDouble());
+                        float a1 = static_cast<float>(colorA[1].GetDouble());
+                        float a2 = static_cast<float>(colorA[2].GetDouble());
+
+                        const auto& color_a = Color(a0, a1, a2);
+
+                        const auto& colorB = texture["color_B"].GetArray();
+                        assert(colorB.Size() == 3);
+
+                        float b0 = static_cast<float>(colorB[0].GetDouble());
+                        float b1 = static_cast<float>(colorB[1].GetDouble());
+                        float b2 = static_cast<float>(colorB[2].GetDouble());
+
+                        const auto& color_b = Color(b0, b1, b2);
+
+                        float square_size = 0.5; // default
+
+                        if (texture.HasMember("square_size") && texture["square_size"].IsFloat())
+                        {
+                            square_size = texture["square_size"].GetFloat();
+                        }
+
+                        this->textureMap[name] = std::make_shared<CheckerTexture>(name, color_a, color_b, square_size);
+                    }
+                }
+
+                else if (texType == "bitmap")
+                {
+                    if (texture.HasMember("file_path") && texture["file_path"].IsString())
+                    {
+                        const std::string filePath = texture["file_path"].GetString();
+
+                        assert(filePath.size() > 1 && "File path empty");
+
+                        this->textureMap[name] = std::make_shared<BitmapTexture>(name, filePath);
+                    }
+                }
+            }
+        }
+    }
+
     // Materials
     // Materials must be loaded before creating meshes
     if (doc.HasMember("materials") && doc["materials"].IsArray())
     {
+        int default_count = 0;
         const auto& materials = doc.FindMember("materials")->value;
         for (const auto& material: materials.GetArray())
         {
@@ -168,16 +281,30 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
 
             }
 
-            if (material.HasMember("albedo") && material["albedo"].IsArray())
+            if (material.HasMember("albedo"))
             {
-                const auto& albedoArr = material["albedo"].GetArray();
-                assert(albedoArr.Size() == 3);
+                if (material["albedo"].IsArray())
+                {
+                    const auto& albedoArr = material["albedo"].GetArray();
+                    assert(albedoArr.Size() == 3);
 
-                float a0 = static_cast<float>(albedoArr[0].GetDouble());
-                float a1 = static_cast<float>(albedoArr[1].GetDouble());
-                float a2 = static_cast<float>(albedoArr[2].GetDouble());
+                    float a0 = static_cast<float>(albedoArr[0].GetDouble());
+                    float a1 = static_cast<float>(albedoArr[1].GetDouble());
+                    float a2 = static_cast<float>(albedoArr[2].GetDouble());
 
-                currentMaterial.albedo = Color(a0, a1, a2);
+                    // create a default texture (For backwards compatibility)
+                    std::string texName = "default" + std::to_string(default_count++);
+                    const auto& albedo = Color(a0, a1, a2);
+                    auto defaultTex = std::make_shared<AlbedoTexture>(texName, albedo);
+                    this->textureMap[texName] = defaultTex;
+
+                    currentMaterial.albedoTex = defaultTex;
+                }
+                else if (material["albedo"].IsString())
+                {
+                    const auto& name = material["albedo"].GetString();
+                    currentMaterial.albedoTex = this->textureMap[name];
+                }
             }
 
             if (material.HasMember("smooth_shading") && material["smooth_shading"].IsBool())
@@ -240,6 +367,21 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
             if (obj.HasMember("material_index") && obj["material_index"].IsInt())
             {
                 mesh.setMaterial(this->meshMaterials[obj["material_index"].GetInt()]);
+            }
+
+            if (obj.HasMember("uvs") && obj["uvs"].IsArray())
+            {
+                const auto& uvArray = obj["uvs"].GetArray();
+                assert(uvArray.Size() % 3 == 0);
+                mesh.vertexUVs.reserve(uvArray.Size() / 3);
+
+                for (unsigned int i = 0; i + 2 < uvArray.Size(); i += 3)
+                {
+                    mesh.insertVectorUVs(static_cast<float>(uvArray[i].GetDouble()),
+                                      static_cast<float>(uvArray[i + 1].GetDouble()),
+                                      static_cast<float>(uvArray[i + 2].GetDouble())
+                                    );
+                }
             }
 
             mesh.computeTriangleNormals();

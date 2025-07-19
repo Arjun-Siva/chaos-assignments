@@ -8,7 +8,7 @@ const double REFRACTION_BIAS = 1e-3;
 const double REFLECTION_BIAS = 1e-3;
 const double EPSILON = 1e-6;
 
-Color refractiveShader(const Ray& ray, const IntersectionData& intersectData, Scene& scene, int max_depth)
+Color refractiveShader(const Ray& ray, IntersectionData& intersectData, Scene& scene, int max_depth)
 {
     vec3 normal = (intersectData.material->smoothShading) ? intersectData.interpolatedVertNormal : intersectData.hitPointNormal;
 
@@ -44,7 +44,7 @@ Color refractiveShader(const Ray& ray, const IntersectionData& intersectData, Sc
         vec3 A = cosBeta * -1 * normal;
         vec3 R = A + B;
 
-        Ray refractionRay(intersectData.hitPoint + (-1* normal * REFRACTION_BIAS), R, RayType::refractive, ray.pathDepth + 1);
+        Ray refractionRay(intersectData.hitPoint + (-1* normal * REFRACTION_BIAS), R, RayType::refraction, ray.pathDepth + 1);
         Color refractionColor = recursiveShader(refractionRay, scene, max_depth);
 
         Ray reflectionRay = ray.reflectedRay(normal, intersectData.hitPoint + (normal * REFLECTION_BIAS));

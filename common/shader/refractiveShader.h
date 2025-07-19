@@ -5,6 +5,6 @@
 #include "scene.h"
 #include "intersectionData.h"
 
-Color refractiveShader(const Ray& ray, const IntersectionData& intersectData, Scene& scene, int max_depth);
+Color refractiveShader(const Ray& ray, IntersectionData& intersectData, Scene& scene, int max_depth);
 
 #endif // REFRACTIVESHADER_H

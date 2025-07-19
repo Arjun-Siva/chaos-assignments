@@ -8,7 +8,12 @@
 #include "material.h"
 #include "ray.h"
 #include "intersectionData.h"
+#include "texture.h"
+
 #include <vector>
+#include <unordered_map>
+#include <memory>
+#include <string>
 
 class Scene
 {
@@ -22,6 +27,8 @@ public:
     std::vector<Mesh> geometryObjects;
     std::vector<Light> lights;
     std::vector<Material> meshMaterials;
+    std::unordered_map<std::string, std::shared_ptr<Texture>> textureMap;
+
 
     Scene();
     Scene(const std::string& sceneFileName);
@@ -30,6 +37,7 @@ public:
     void parseSceneFile(const std::string& sceneFileName);
     void addLight(Light& light);
     void addMaterial(Material& material);
+    void addTexture(std::string& name, std::shared_ptr<Texture> texture);
     IntersectionData traceRay(const Ray& ray);
 
 };

@@ -1,0 +1,2 @@
+add_executable(assignment_12 textureShading.cpp)
+target_link_libraries(assignment_12 PRIVATE common)

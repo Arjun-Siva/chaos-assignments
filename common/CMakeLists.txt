@@ -22,6 +22,11 @@ target_sources(common
         shader/recursiveShader.cpp
         util/transform.h
         util/renderPPM.h
+        texture/texture.h
+        texture/albedoTexture.h
+        texture/bitmapTexture.h
+        texture/checkerTexture.h
+        texture/edgeTexture.h
 )
 
 target_include_directories(common
@@ -32,4 +37,6 @@ target_include_directories(common
         ${CMAKE_CURRENT_SOURCE_DIR}/util
         ${CMAKE_CURRENT_SOURCE_DIR}/rapidjson
         ${CMAKE_CURRENT_SOURCE_DIR}/shader
+        ${CMAKE_CURRENT_SOURCE_DIR}/texture
+        ${CMAKE_CURRENT_SOURCE_DIR}/stb_image
 )

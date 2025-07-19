@@ -9,7 +9,7 @@ enum class RayType
     camera,
     shadow,
     reflection,
-    refractive
+    refraction
 };
 
 class Ray

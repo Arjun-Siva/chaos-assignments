@@ -5,6 +5,6 @@
 #include "scene.h"
 #include "intersectionData.h"
 
-Color diffuseShader(const IntersectionData& intersectData, Scene& scene);
+Color diffuseShader(IntersectionData& intersectData, Scene& scene);
 
 #endif // DIFFUSESHADER_H

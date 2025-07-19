@@ -5,6 +5,6 @@
 #include "scene.h"
 #include "intersectionData.h"
 
-Color reflectiveShader(const Ray& ray, const IntersectionData& intersectData, Scene& scene, int max_depth);
+Color reflectiveShader(const Ray& ray, IntersectionData& intersectData, Scene& scene, int max_depth);
 
 #endif // REFLECTIVESHADER_H

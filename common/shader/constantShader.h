@@ -5,6 +5,6 @@
 #include "scene.h"
 #include "color.h"
 
-Color constantShader(const IntersectionData& intersectData, Scene& scene);
+Color constantShader(IntersectionData& intersectData, Scene& scene);
 
 #endif // CONSTANTSHADER_H

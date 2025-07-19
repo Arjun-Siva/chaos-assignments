@@ -5,12 +5,14 @@
 const double EPSILON = 1e-6;
 const double SHADOW_BIAS = 1e-3;
 
-Color diffuseShader(const IntersectionData& intersectData, Scene& scene)
+Color diffuseShader(IntersectionData& intersectData, Scene& scene)
 {
     const Material hitMaterial = *intersectData.material;
-    const float albedoR = hitMaterial.albedo.r;
-    const float albedoG = hitMaterial.albedo.g;
-    const float albedoB = hitMaterial.albedo.b;
+
+    Color albedo = scene.geometryObjects[intersectData.objectIdx].getAlbedo(intersectData.baryCentricCoords, intersectData.triangleIdx);
+    const float albedoR = albedo.r;
+    const float albedoG = albedo.g;
+    const float albedoB = albedo.b;
     // Shadow ray
     vec3 shadowOrigin = intersectData.hitPoint + intersectData.hitPointNormal * SHADOW_BIAS;
     Color pixelColor = Color(0, 0, 0);
