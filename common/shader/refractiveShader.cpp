@@ -6,7 +6,6 @@
 
 const double REFRACTION_BIAS = 1e-3;
 const double REFLECTION_BIAS = 1e-3;
-const double EPSILON = 1e-6;
 
 Color refractiveShader(const Ray& ray, IntersectionData& intersectData, Scene& scene, int max_depth)
 {

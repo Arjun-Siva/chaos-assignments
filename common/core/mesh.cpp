@@ -5,8 +5,8 @@
 #include <cstdlib>
 #include <vector>
 #include <cassert>
+#include <limits>
 
-const double EPSILON = 1e-6;
 
 Mesh::Mesh() : uniformColor(Color(1.0f, 1.0f, 1.0f)), randomizeColors(false)
 {}
@@ -138,6 +138,10 @@ double Mesh::intersectRay(const Ray& r, int& hitTriangleIndex, vec3& hitPoint, v
     if (r.type == RayType::shadow && this->material.type == MaterialType::Refractive)
         return -1.0;
 
+    // AABB intersection test
+    if (!this->boundingBox.rayIntersectBox(r))
+        return -1.0;
+
     for (size_t i = 0; i < triangleVertIndices.size(); i += 3)
     {
         const vec3& v0 = vertices[triangleVertIndices[i]];
@@ -241,4 +245,28 @@ Color Mesh::getAlbedo(BaryCoord& baryPoint, int triangleIndex)
     float v = baryPoint.u * uv1.y + baryPoint.v * uv2.y + baryPoint.w * uv0.y;
 
     return this->material.albedoTex->getTextureAlbedo(u, v, baryPoint);
+}
+
+
+void Mesh::computeAABB()
+{
+    float minx, miny, minz, maxx, maxy, maxz;
+    minx = miny = minz = std::numeric_limits<float>::infinity();
+    maxx = maxy = maxz = -std::numeric_limits<float>::infinity();
+
+    for (vec3 vertex : this->vertices)
+    {
+        minx = std::min(vertex.x, minx);
+        miny = std::min(vertex.y, miny);
+        minz = std::min(vertex.z, minz);
+
+        maxx = std::max(vertex.x, maxx);
+        maxy = std::max(vertex.y, maxy);
+        maxz = std::max(vertex.z, maxz);
+    }
+
+    vec3 minv = vec3(minx, miny, minz);
+    vec3 maxv = vec3(maxx, maxy, maxz);
+
+    this->boundingBox = AABB(minv, maxv);
 }

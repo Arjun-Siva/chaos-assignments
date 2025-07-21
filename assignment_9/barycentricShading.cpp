@@ -7,10 +7,9 @@
 #include "triangle.h"
 
 
-double EPSILON = 1e-6;
-
 void shadeBarycentric(const std::string &outputFile, Scene& scene)
 {
+    double EPSILON = 1e-6;
     int width = scene.width;
     int height = scene.height;
     Camera camera = scene.camera;

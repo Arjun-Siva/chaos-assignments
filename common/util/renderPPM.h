@@ -10,10 +10,9 @@
 #include "color.h"
 #include "triangle.h"
 
-double EPSILON = 1e-6;
-
 void renderScene(const std::string &filename, int width, int height, Camera& camera, const std::vector<Triangle>& triangles, Color bg)
 {
+    double EPSILON = 1e-6;
     std::ofstream out(filename);
     out << "P3\n" << width << ' ' << height << "\n255\n";
 

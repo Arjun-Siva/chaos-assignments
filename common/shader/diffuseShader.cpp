@@ -2,7 +2,6 @@
 #include "scene.h"
 #include "intersectionData.h"
 
-const double EPSILON = 1e-6;
 const double SHADOW_BIAS = 1e-3;
 
 Color diffuseShader(IntersectionData& intersectData, Scene& scene)

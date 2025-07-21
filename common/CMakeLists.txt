@@ -15,6 +15,7 @@ target_sources(common
         core/baryCoord.h
         core/intersectionData.h
         core/light.cpp
+        core/aabb.h
         shader/diffuseShader.cpp
         shader/refractiveShader.cpp
         shader/reflectiveShader.cpp

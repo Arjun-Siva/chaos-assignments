@@ -9,8 +9,6 @@
 #include "recursiveShader.h"
 
 
-double EPSILON = 1e-6;
-
 void shadeSmooth(const std::string &outputFile, Scene& scene)
 {
     int width = scene.width;

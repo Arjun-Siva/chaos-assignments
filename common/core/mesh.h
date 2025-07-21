@@ -6,6 +6,7 @@
 #include "color.h"
 #include "material.h"
 #include "baryCoord.h"
+#include "aabb.h"
 #include <vector>
 
 class Mesh
@@ -26,6 +27,7 @@ public:
     double intersectRay(const Ray& r, int& hitTriangleIndex, vec3& hitPoint, vec3& hitNormal, bool cullBackFaces) const;
     Color getAlbedo(BaryCoord& baryPoint, int triangleIndex);
     void insertVectorUVs(float u, float v, float w);
+    void computeAABB();
 
     Color uniformColor;
     bool randomizeColors;
@@ -35,7 +37,7 @@ public:
     std::vector<vec3> vertexNormals;
     Material material;
     std::vector<vec3> vertexUVs;
-
+    AABB boundingBox;
 };
 
 #endif // MESH_H

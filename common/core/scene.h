@@ -28,6 +28,7 @@ public:
     std::vector<Light> lights;
     std::vector<Material> meshMaterials;
     std::unordered_map<std::string, std::shared_ptr<Texture>> textureMap;
+    int bucketSize;
 
 
     Scene();

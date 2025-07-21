@@ -20,7 +20,6 @@
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
 
-const double EPSILON = 1e-6;
 
 using namespace rapidjson;
 
@@ -29,6 +28,7 @@ Scene::Scene() : camera(1920.0f/1080.0f)
     this->bgColor = Color(0, 0, 0);
     this->height = 1080;
     this->width = 1920;
+    this->bucketSize = 1;
 }
 
 Scene::Scene(const std::string& sceneFileName) : camera(1920.0f/1080.0f)
@@ -73,6 +73,10 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
     Document doc;
     doc.ParseStream(isw);
 
+    if (doc.HasParseError()) {
+        std::cerr << "Parse error: " << doc.GetParseError() << std::endl;
+    }
+
     // Settings
     const Value& settingsVal = doc.FindMember("settings")->value;
 
@@ -89,7 +93,6 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
                     );
         }
 
-
         const Value& imageDim = settingsVal.FindMember("image_settings")->value;
         if(!imageDim.IsNull() && imageDim.IsObject())
         {
@@ -97,6 +100,8 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
             if (!hv.IsNull()) this->height = static_cast<int>(hv.GetDouble());
             const Value& wv = imageDim.FindMember("width")->value;
             if (!wv.IsNull()) this->width = static_cast<int>(wv.GetDouble());
+            const Value& bucket_size = imageDim.FindMember("bucket_size")->value;
+            if (!bucket_size.IsNull()) this->bucketSize = static_cast<int>(bucket_size.GetDouble());
         }
     }
 
@@ -386,6 +391,7 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
 
             mesh.computeTriangleNormals();
             mesh.computeVertexNormals();
+            mesh.computeAABB();
 
             this->addMesh(mesh);
         }

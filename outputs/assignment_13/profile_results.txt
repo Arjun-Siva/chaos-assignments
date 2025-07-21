@@ -1,0 +1,5 @@
+Debug config: 820.988 seconds
+Release config: 436.473 seconds
+Multi threaded: 132.099 seconds
+Buckets (8 threads): 107.296 seconds
+AABB (8 threads): 58.54 seconds

@@ -1,0 +1,6 @@
+add_executable(assignment_13_normal normalShader.cpp)
+add_executable(assignment_13_multi mutlithreadedShader.cpp)
+add_executable(assignment_13_bucket bucketShader.cpp)
+target_link_libraries(assignment_13_normal PRIVATE common)
+target_link_libraries(assignment_13_multi PRIVATE common)
+target_link_libraries(assignment_13_bucket PRIVATE common)
