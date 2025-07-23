@@ -11,11 +11,14 @@
 #include "checkerTexture.h"
 #include "edgeTexture.h"
 #include "bitmapTexture.h"
+#include "bvhnode.h"
 
 #include <vector>
 #include <fstream>
 #include <iostream>
 #include <cassert>
+#include <algorithm>
+#include <memory>
 
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
@@ -483,4 +486,200 @@ IntersectionData Scene::traceRay(const Ray &ray)
     }
 
     return iData;
+}
+
+
+std::vector<Triangle> Scene::getAllTrianglesInScene()
+{
+    std::vector<Triangle> sceneTriangles;
+    for (size_t oid = 0; oid < this->geometryObjects.size(); oid++)
+    {
+        Mesh& mesh = this->geometryObjects[oid];
+        std::vector<Triangle> objectTriangles = mesh.generateTriangleWithCentroidList(oid);
+        sceneTriangles.insert(sceneTriangles.end(), objectTriangles.begin(), objectTriangles.end());
+    }
+
+    return sceneTriangles;
+}
+
+
+double Scene::shortestIntersectionInNode(BVHNode* node,const Ray &ray, int &hitTriangleIdx, int &hitObjectIdx, vec3 &hitPoint, vec3 &hitNormal)
+{
+    double minT = 1/EPSILON;
+    hitTriangleIdx = -1;
+
+    assert(node != nullptr);
+
+    // AABB intersection test
+    if (!node->boundingBox.rayIntersectBox(ray))
+        return -1.0;
+
+    // leaf node
+    if (node->left == nullptr && node->right == nullptr)
+    {
+        for (auto& trianglePair : node->triangleIndices)
+        {
+            int meshIdx = trianglePair.first;
+            int triangleIdx = trianglePair.second;
+
+            Mesh& triangleMesh = this->geometryObjects[meshIdx];
+            // if the mesh's material is refractive, all the triangles in it can be ignored for shadow ray
+            if (ray.type == RayType::shadow && triangleMesh.material.type == MaterialType::Refractive)
+                continue;
+
+            bool cullBackfaces = (triangleMesh.material.type == MaterialType::Refractive || ray.type == RayType::shadow) ? false : true;
+
+            const vec3& v0 = triangleMesh.vertices[triangleMesh.triangleVertIndices[triangleIdx*3]];
+            const vec3& v1 = triangleMesh.vertices[triangleMesh.triangleVertIndices[triangleIdx*3 + 1]];
+            const vec3& v2 = triangleMesh.vertices[triangleMesh.triangleVertIndices[triangleIdx*3 + 2]];
+            const vec3& normal = triangleMesh.triangleNormals[triangleIdx];
+
+            if (cullBackfaces && normal.dot(ray.d) > EPSILON) continue; // backface culling
+
+            // proj is negative if the normal and ray are in opposite direction. positive if the directions are same
+            double proj = normal.dot(ray.d);
+            if (std::abs(proj) < EPSILON) continue; // parallel (normal is perpendicular to ray)
+
+            double t = normal.dot(v0 - ray.o) / proj;
+            if (t < EPSILON || t > minT) continue; // opposite direction
+
+            vec3 p = ray.o + ray.d * t;
+
+            vec3 e01 = v1 - v0;
+            vec3 e12 = v2 - v1;
+            vec3 e20 = v0 - v2;
+
+            if (normal.dot(e01.cross(p - v0)) < -EPSILON) continue;
+            if (normal.dot(e12.cross(p - v1)) < -EPSILON) continue;
+            if (normal.dot(e20.cross(p - v2)) < -EPSILON) continue;
+
+            if (t < minT)
+            {
+                minT = t;
+                hitPoint = p;
+                hitNormal = normal;
+                hitObjectIdx = meshIdx;
+                hitTriangleIdx = triangleIdx;
+            }
+
+        }
+
+        return (hitTriangleIdx != -1) ? minT : -1.0;
+    }
+    else
+    {
+        double minDist = 1/EPSILON;
+        double t = -1.0;
+        int leftChildHitTriangleIdx = -1;
+        int leftChildHitObjectIdx = -1;
+        vec3 leftChildHitPoint;
+        vec3 leftChildHitNormal;
+        int rightChildHitTriangleIdx = -1;
+        int rightChildHitObjectIdx = -1;
+        vec3 rightChildHitPoint;
+        vec3 rightChildHitNormal;
+
+        if (node->left != nullptr)
+        {
+            t = this->shortestIntersectionInNode(node->left.get(), ray, leftChildHitTriangleIdx, leftChildHitObjectIdx, leftChildHitPoint, leftChildHitNormal);
+
+            if (t > -EPSILON)
+            {
+                hitTriangleIdx = leftChildHitTriangleIdx;
+                hitObjectIdx = leftChildHitObjectIdx;
+                hitNormal = leftChildHitNormal;
+                hitPoint = leftChildHitPoint;
+                minDist = t;
+            }
+        }
+
+        if (node->right != nullptr)
+        {
+            t = this->shortestIntersectionInNode(node->right.get(), ray, rightChildHitTriangleIdx, rightChildHitObjectIdx, rightChildHitPoint, rightChildHitNormal);
+
+            if (t > -EPSILON && t < minDist)
+            {
+                hitTriangleIdx = rightChildHitTriangleIdx;
+                hitObjectIdx = rightChildHitObjectIdx;
+                hitNormal = rightChildHitNormal;
+                hitPoint = rightChildHitPoint;
+                minDist = t;
+            }
+        }
+
+        return minDist;
+    }
+}
+
+
+IntersectionData Scene::traceRayBVH(const Ray &ray)
+{
+    // find shortest intersecting triangle
+    // find the point of intersection
+    // get the normal of triangle
+
+    IntersectionData iData;
+
+    vec3 hitPoint;
+    vec3 hitNormal;
+    int hitTriangleIdx = -1;
+    int hitObjectIdx = -1;
+    Material* hitMaterial = nullptr;
+    float shortestIntersection = -1.0;
+
+    shortestIntersection = this->shortestIntersectionInNode(this->bvhRoot.get(), ray, hitTriangleIdx, hitObjectIdx, hitPoint, hitNormal);
+
+    if (shortestIntersection > -EPSILON && hitObjectIdx > -1)
+    {
+        hitMaterial = &(this->geometryObjects[hitObjectIdx].material);
+        iData.hitPoint = hitPoint;
+        iData.hitPointNormal = hitNormal;
+        iData.material = hitMaterial;
+        iData.objectIdx = hitObjectIdx;
+        iData.triangleIdx = hitTriangleIdx;
+
+        iData.baryCentricCoords = this->geometryObjects[hitObjectIdx].findBaryCentricCoords(hitPoint, hitTriangleIdx);
+        iData.interpolatedVertNormal = this->geometryObjects[hitObjectIdx].findInterpolatedVertNormal(iData.baryCentricCoords, hitTriangleIdx);
+    }
+
+    return iData;
+}
+
+
+std::unique_ptr<BVHNode> Scene::buildBVHTree(std::vector<Triangle>& allTrianglesInParent, int depth = 0)
+{
+    assert(!allTrianglesInParent.empty() && "No triangles to build a tree");
+
+    auto node = std::unique_ptr<BVHNode>(new BVHNode());
+    node->createBB(allTrianglesInParent);
+
+//    std::cout << std::string(depth, ' ') << "Depth " << depth << ", Tri count: " << allTrianglesInParent.size() << "\n";
+
+    if ((int)allTrianglesInParent.size() <= min_triangles_per_bvhnode || depth >= max_bvhtree_depth)
+    {
+        node->triangleIndices.reserve(allTrianglesInParent.size());
+        for (const auto& tri : allTrianglesInParent)
+            node->triangleIndices.emplace_back(tri.meshIdx, tri.triangleIdx);
+
+//        std::cout << std::string(depth, ' ') << "Leaf created with " << node->triangleIndices.size() << " triangles\n";
+        return node;
+    }
+
+    int axis = depth % 3;
+    std::sort(allTrianglesInParent.begin(), allTrianglesInParent.end(),
+        [axis](const Triangle& a, const Triangle& b) {
+            if (axis == 0) return a.centroid.x < b.centroid.x;
+            if (axis == 1) return a.centroid.y < b.centroid.y;
+            return a.centroid.z < b.centroid.z;
+        });
+
+    size_t mid = allTrianglesInParent.size() / 2;
+    std::vector<Triangle> left(allTrianglesInParent.begin(), allTrianglesInParent.begin() + mid);
+    std::vector<Triangle> right(allTrianglesInParent.begin() + mid, allTrianglesInParent.end());
+
+    assert(!left.empty() && !right.empty());
+    node->left = buildBVHTree(left, depth + 1);
+    node->right = buildBVHTree(right, depth + 1);
+
+    return node;
 }

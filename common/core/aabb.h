@@ -41,76 +41,80 @@ public:
 
     }
 
+
     bool rayIntersectBox(const Ray& ray) const
     {
-
-        float tMin = EPSILON;
+        float tMin = -std::numeric_limits<float>::infinity();
         float tMax = std::numeric_limits<float>::infinity();
 
+        // X-axis
         if (std::abs(ray.d.x) < EPSILON)
         {
-            // Ray is parallel to slab; does it lie within slab?
             if (ray.o.x < min_vertex.x || ray.o.x > max_vertex.x)
                 return false;
         }
+        else
+        {
+            float invD = 1.0f / ray.d.x;
+            float t0 = (min_vertex.x - ray.o.x) * invD;
+            float t1 = (max_vertex.x - ray.o.x) * invD;
 
-        float invD = 1.0f / ray.d.x;
-        float t0 = (min_vertex.x - ray.o.x) * invD;
-        float t1 = (max_vertex.x - ray.o.x) * invD;
+            if (invD < 0.0f)
+                std::swap(t0, t1);
 
-        if (invD < 0.0f)
-            std::swap(t0, t1);
+            tMin = std::max(t0, tMin);
+            tMax = std::min(t1, tMax);
 
-        tMin = t0 > tMin ? t0 : tMin;
-        tMax = t1 < tMax ? t1 : tMax;
+            if (tMin > tMax)
+                return false;
+        }
 
-        if (tMax <= tMin)
-            return false;
-
-        // y
-
+        // Y-axis
         if (std::abs(ray.d.y) < EPSILON)
         {
-            // Ray is parallel to slab; does it lie within slab?
             if (ray.o.y < min_vertex.y || ray.o.y > max_vertex.y)
                 return false;
         }
-
-        invD = 1.0f / ray.d.y;
-        t0 = (min_vertex.y - ray.o.y) * invD;
-        t1 = (max_vertex.y - ray.o.y) * invD;
-
-        if (invD < 0.0f)
-            std::swap(t0, t1);
-
-        tMin = t0 > tMin ? t0 : tMin;
-        tMax = t1 < tMax ? t1 : tMax;
-
-        if (tMax <= tMin)
-            return false;
-
-        // z
-        if (std::abs(ray.d.z) < EPSILON)
+        else
         {
-            // Ray is parallel to slab; does it lie within slab?
-            if (ray.o.z < min_vertex.z || ray.o.z > max_vertex.z)
+            float invD = 1.0f / ray.d.y;
+            float t0 = (min_vertex.y - ray.o.y) * invD;
+            float t1 = (max_vertex.y - ray.o.y) * invD;
+
+            if (invD < 0.0f)
+                std::swap(t0, t1);
+
+            tMin = std::max(t0, tMin);
+            tMax = std::min(t1, tMax);
+
+            if (tMin > tMax)
                 return false;
         }
 
-        invD = 1.0f / ray.d.z;
-        t0 = (min_vertex.z - ray.o.z) * invD;
-        t1 = (max_vertex.z - ray.o.z) * invD;
+        // Z-axis
+        if (std::abs(ray.d.z) < EPSILON)
+        {
+            if (ray.o.z < min_vertex.z || ray.o.z > max_vertex.z)
+                return false;
+        }
+        else
+        {
+            float invD = 1.0f / ray.d.z;
+            float t0 = (min_vertex.z - ray.o.z) * invD;
+            float t1 = (max_vertex.z - ray.o.z) * invD;
 
-        if (invD < 0.0f)
-            std::swap(t0, t1);
+            if (invD < 0.0f)
+                std::swap(t0, t1);
 
-        tMin = t0 > tMin ? t0 : tMin;
-        tMax = t1 < tMax ? t1 : tMax;
+            tMin = std::max(t0, tMin);
+            tMax = std::min(t1, tMax);
 
-        if (tMax <= tMin)
-            return false;
+            if (tMin > tMax)
+                return false;
+        }
 
-        return true;
+        // Final check - accepts negative tMin (internal rays)
+        return tMax > 0.0f;
     }
 
 };

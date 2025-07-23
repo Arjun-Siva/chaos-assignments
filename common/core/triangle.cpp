@@ -13,12 +13,22 @@ Triangle::Triangle(const vec3 &a, const vec3 &b, const vec3 &c, const Color& col
     computeNormal();
 }
 
+// this constructor will be used by the scene object for BVH
+Triangle::Triangle(const vec3 &a, const vec3 &b, const vec3 &c, const int meshIdx, const int triangleIdx) : v0(a), v1(b), v2(c), meshIdx(meshIdx), triangleIdx(triangleIdx) {
+//    computeNormal(); - not necessary for BVH
+    computeCentroid();
+}
+
 
 void Triangle::computeNormal() {
     vec3 edge1 = this->v1 - this->v0;
     vec3 edge2 = this->v2 - this->v0;
 
     this->normal = (edge1.cross(edge2)).normalized();
+}
+
+void Triangle::computeCentroid() {
+    this->centroid = (this->v0 + this->v1 + this->v2) / 3;
 }
 
 double Triangle::intersect(const Ray &r) const {

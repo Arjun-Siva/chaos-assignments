@@ -78,6 +78,30 @@ std::vector<Triangle> Mesh::generateTriangleList() const
     return triangles;
 }
 
+
+std::vector<Triangle> Mesh::generateTriangleWithCentroidList(int objectId) const
+{
+    assert((triangleVertIndices.size() % 3 == 0) && "Missing indices for triangles");
+    std::vector<Triangle> triangles;
+    triangles.reserve(triangleVertIndices.size() / 3);
+
+    for(size_t i=0; i+2 < triangleVertIndices.size(); i += 3)
+    {
+        int idx0 = triangleVertIndices[i];
+        int idx1 = triangleVertIndices[i + 1];
+        int idx2 = triangleVertIndices[i + 2];
+
+        const vec3& v0 = vertices[idx0];
+        const vec3& v1 = vertices[idx1];
+        const vec3& v2 = vertices[idx2];
+
+        triangles.push_back(Triangle(v0, v1, v2, objectId, i/3));
+    }
+
+    return triangles;
+}
+
+
 void Mesh::setMaterial(const Material& material)
 {
     this->material = material;

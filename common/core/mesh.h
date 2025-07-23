@@ -17,6 +17,7 @@ public:
     void insertTriangleIndex(int i0, int i1, int i2);
     Triangle getTriangleByIndex(const int index) const;
     std::vector<Triangle> generateTriangleList() const;
+    std::vector<Triangle> generateTriangleWithCentroidList(int objectId) const;
     void setUniformColor(const Color &color);
     void setRandomColors();
     void setMaterial(const Material& material);

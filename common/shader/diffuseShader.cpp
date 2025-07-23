@@ -28,15 +28,31 @@ Color diffuseShader(IntersectionData& intersectData, Scene& scene)
         double distanceToLight = (light.getPosition() - shadowOrigin).length();
         bool shadowReachLight = true;
 
-        for (const Mesh& mesh : scene.geometryObjects)
+        if (scene.useBVH)
         {
-            double st = mesh.intersectRay(shadowRay, shadownHitTriangleIndex, shadowHitPoint, shadowDHitNormal, false);
+            IntersectionData t = scene.traceRayBVH(shadowRay);
 
-            // intersection before reaching light
-            if (st < distanceToLight && st > EPSILON)
+            if (t.objectIdx != -1)
             {
-                shadowReachLight = false;
-                break;
+                shadowHitPoint = t.hitPoint;
+                double st = (shadowHitPoint - shadowOrigin).length();
+                if (st < distanceToLight && st > EPSILON)
+                    shadowReachLight = false;
+            }
+        }
+
+        else
+        {
+            for (const Mesh& mesh : scene.geometryObjects)
+            {
+                double st = mesh.intersectRay(shadowRay, shadownHitTriangleIndex, shadowHitPoint, shadowDHitNormal, false);
+
+                // intersection before reaching light
+                if (st < distanceToLight && st > EPSILON)
+                {
+                    shadowReachLight = false;
+                    break;
+                }
             }
         }
 

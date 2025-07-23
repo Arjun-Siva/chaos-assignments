@@ -9,6 +9,8 @@
 #include "ray.h"
 #include "intersectionData.h"
 #include "texture.h"
+#include "triangle.h"
+#include "bvhnode.h"
 
 #include <vector>
 #include <unordered_map>
@@ -29,6 +31,11 @@ public:
     std::vector<Material> meshMaterials;
     std::unordered_map<std::string, std::shared_ptr<Texture>> textureMap;
     int bucketSize;
+//    std::vector<BVHNode> bvhNodesVector;
+    std::unique_ptr<BVHNode> bvhRoot = nullptr;
+    int max_bvhtree_depth;
+    int min_triangles_per_bvhnode;
+    bool useBVH = false;
 
 
     Scene();
@@ -40,6 +47,10 @@ public:
     void addMaterial(Material& material);
     void addTexture(std::string& name, std::shared_ptr<Texture> texture);
     IntersectionData traceRay(const Ray& ray);
+    std::vector<Triangle> getAllTrianglesInScene();
+    double shortestIntersectionInNode(BVHNode* node, const Ray &ray, int &hitTriangleIdx, int &hitObjectIdx, vec3 &hitPoint, vec3 &hitNormal);
+    IntersectionData traceRayBVH(const Ray& ray);
+    std::unique_ptr<BVHNode> buildBVHTree(std::vector<Triangle>& allTrianglesInParent, int depth);
 
 };
 

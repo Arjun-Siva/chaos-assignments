@@ -28,6 +28,7 @@ target_sources(common
         texture/bitmapTexture.h
         texture/checkerTexture.h
         texture/edgeTexture.h
+        accTree/bvhnode.cpp
 )
 
 target_include_directories(common
@@ -40,4 +41,5 @@ target_include_directories(common
         ${CMAKE_CURRENT_SOURCE_DIR}/shader
         ${CMAKE_CURRENT_SOURCE_DIR}/texture
         ${CMAKE_CURRENT_SOURCE_DIR}/stb_image
+        ${CMAKE_CURRENT_SOURCE_DIR}/accTree
 )
