@@ -20,6 +20,7 @@ target_sources(common
         shader/refractiveShader.cpp
         shader/reflectiveShader.cpp
         shader/constantShader.cpp
+        shader/phongShader.cpp
         shader/recursiveShader.cpp
         util/transform.h
         util/renderPPM.h

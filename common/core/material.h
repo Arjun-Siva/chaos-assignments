@@ -11,7 +11,8 @@ enum class MaterialType {
     Diffuse,
     Reflective,
     Refractive,
-    Constant
+    Constant,
+    Phong
 };
 
 class Material {
@@ -19,7 +20,14 @@ public:
     std::shared_ptr<Texture> albedoTex;
     MaterialType type;
     bool smoothShading;
-    float ior;
+    float ior; // refractive index
+    int shininess; // exponent in phong
+    float ambientLightIntensity;
+
+    //phong parameters
+    float ka; //ambient coefficient
+    float kd; //diffuse
+    float ks; //specular
 
     Material();
     Material(std::shared_ptr<Texture> texture, MaterialType type, bool doSmoothShading);

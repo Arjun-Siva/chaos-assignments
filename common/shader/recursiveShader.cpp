@@ -7,6 +7,7 @@
 #include "refractiveShader.h"
 #include "constantShader.h"
 #include "reflectiveShader.h"
+#include "phongShader.h"
 
 
 Color recursiveShader(const Ray &ray, Scene& scene, int max_depth)
@@ -36,7 +37,7 @@ Color recursiveShader(const Ray &ray, Scene& scene, int max_depth)
 
     if (hitMaterial.type == MaterialType::Diffuse)
     {
-        return diffuseShader(iData, scene);
+        return diffuseShader(ray, iData, scene, max_depth);
     }
 
     else if (hitMaterial.type == MaterialType::Reflective)
@@ -52,6 +53,11 @@ Color recursiveShader(const Ray &ray, Scene& scene, int max_depth)
     else if (hitMaterial.type == MaterialType::Constant)
     {
         return constantShader(iData, scene);
+    }
+
+    else if (hitMaterial.type == MaterialType::Phong)
+    {
+        return phongShader(iData, scene);
     }
 
     assert(false&&"Invalid material");

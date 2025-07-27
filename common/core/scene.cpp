@@ -286,6 +286,10 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
                 {
                     currentMaterial.type = MaterialType::Constant;
                 }
+                else if (matType == "phong")
+                {
+                    currentMaterial.type = MaterialType::Phong;
+                }
 
             }
 
@@ -323,6 +327,31 @@ void Scene::parseSceneFile(const std::string &sceneFileName)
             if (material.HasMember("ior") && material["ior"].IsDouble())
             {
                 currentMaterial.ior = static_cast<float>(material["ior"].GetDouble());
+            }
+
+            if (material.HasMember("ambientLightIntensity") && material["ambientLightIntensity"].IsDouble())
+            {
+                currentMaterial.ambientLightIntensity = static_cast<float>(material["ambientLightIntensity"].GetDouble());
+            }
+
+            if (material.HasMember("shininess") && material["shininess"].IsDouble())
+            {
+                currentMaterial.shininess = static_cast<float>(material["shininess"].GetDouble());
+            }
+
+            if (material.HasMember("ka") && material["ka"].IsDouble())
+            {
+                currentMaterial.ka = static_cast<float>(material["ka"].GetDouble());
+            }
+
+            if (material.HasMember("kd") && material["kd"].IsDouble())
+            {
+                currentMaterial.kd = static_cast<float>(material["kd"].GetDouble());
+            }
+
+            if (material.HasMember("ks") && material["ks"].IsDouble())
+            {
+                currentMaterial.ks = static_cast<float>(material["ks"].GetDouble());
             }
 
             this->addMaterial(currentMaterial);

@@ -1,0 +1,2 @@
+add_executable(assignment_15 globalIllumination.cpp)
+target_link_libraries(assignment_15 PRIVATE common)

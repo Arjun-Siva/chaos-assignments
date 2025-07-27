@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <queue>
+#include <cstdlib>
 
 #include "mesh.h"
 #include "scene.h"
@@ -24,6 +25,7 @@ struct Bucket
 // Shared queue and mutex
 std::queue<Bucket> renderQueue;
 std::mutex queueMutex;
+float numberOfBuckets;
 
 void createBuckets(int imageWidth, int imageHeight, int bucketSize)
 {
@@ -37,6 +39,7 @@ void createBuckets(int imageWidth, int imageHeight, int bucketSize)
            renderQueue.push({x, y, w, h});
         }
     }
+    numberOfBuckets = renderQueue.size();
 }
 
 
@@ -48,13 +51,17 @@ void renderRegion(Scene& scene, PixelBuffer& buffer, int startX, int startY, int
 
     for (int y = startY; y < startY + region_height; ++y) {
         for (int x = startX; x < startX + region_width; ++x) {
-            float u = (x + 0.5f) / width;
-            float v = (y + 0.5f) / height;
+            Color pixelColor = Color(0, 0, 0);
+            for (int n = 0; n < 128; ++n) { //AA
+                float x_offset = static_cast<float>(rand()) / RAND_MAX;
+                float y_offset = static_cast<float>(rand()) / RAND_MAX;
+                float u = (x + x_offset) / width;
+                float v = (y + y_offset) / height;
+                Ray ray = camera.generateRay(u, v);
 
-            Ray ray = camera.generateRay(u, v);
-
-            Color pixelColor = recursiveShader(ray, scene, 5);
-            buffer.setColor(x, y, pixelColor);
+                pixelColor = pixelColor + recursiveShader(ray, scene, 5);
+            }
+            buffer.setColor(x, y, pixelColor * (1.0f / 128.f));
         }
     }
 }
@@ -76,7 +83,7 @@ void workerThread(Scene& scene, PixelBuffer& buffer)
         }
 
         renderRegion(scene, buffer, region.x, region.y, region.width, region.height);
-
+        std::cout<< (1.0f - static_cast<float>(renderQueue.size()) / numberOfBuckets) * 100 <<"% completed"<<std::endl;
     }
 }
 
@@ -136,9 +143,15 @@ void shadeTexture(const std::string &outputFile, Scene& scene)
 
 int main()
 {
-    std::string sceneFileName = "glassball.crtscene";
+    std::string sceneFileName = "scene2.crtscene";
 
     Scene scene(sceneFileName);
+    scene.gi_ray_count = 1;
+    scene.bucketSize = 24;
+
+    scene.height = 720;
+    scene.width = 720;
+
 
     assert(scene.bucketSize > 0);
 
@@ -147,7 +160,7 @@ int main()
         mesh.setUniformColor(Color(1, 1, 1));
     }
 
-   shadeTexture(sceneFileName.substr(0, sceneFileName.find_last_of('.'))+"_bvh.ppm", scene);
+   shadeTexture(sceneFileName.substr(0, sceneFileName.find_last_of('.'))+"_gi.ppm", scene);
 
     std::cout<<"Render completed"<<std::endl;
     return 0;
